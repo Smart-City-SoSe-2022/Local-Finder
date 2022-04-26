@@ -5,6 +5,8 @@
   </div>
 </template>
 
+
+<!-- Requests /ping from server to recive 'pong' and put it inside <p> -->
 <script>
 import axios from 'axios'
 
@@ -46,7 +48,7 @@ li {
   display: inline-block;
   margin: 0 10px;
 }
-a {
+a { 
   color: #42b983;
 }
 </style>
