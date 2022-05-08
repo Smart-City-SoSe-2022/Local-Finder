@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
+import pika
 
 # To combine the build frontend with the backend 
 # I changed the default static and template folders 
@@ -43,6 +44,17 @@ def ping_pong():
         return jsonify('pong')
     except:
         return 'Faield to commit to the Database. app.route/ping'
+
+@app.route('/api/rabbit', methods=['GET'])
+def rabbit():
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='hello')
+    channel.basic_publish(exchange='', routing_key='hello', body='Hello Wurlululululu')
+    print(' [x] Sent WUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU')
+    connection.close()
+    
+    return 'Ich bin ein Hase'
 
 if __name__ == '__main__':
     app.run(debug=True)

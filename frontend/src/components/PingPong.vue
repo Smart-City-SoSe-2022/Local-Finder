@@ -6,7 +6,12 @@
 </template>
 
 
-<!-- Requests /ping from server to recive 'pong' and put it inside <p> -->
+<!-- PingPong.vue is a testing component 
+  Requests /api calls from server to recive 'pong' and put it inside <p> 
+
+  getPingPong creates a DB entry
+  getRabbit communicates with rabbitMQ
+-->
 <script>
 import axios from 'axios'
 
@@ -21,8 +26,21 @@ export default {
     }
   },
   methods: {
+    /* test function pingpong
+      calls the backend and creates a test object in the database
+    */
     getPingPong() {
       const path = 'api/ping'
+      axios.get(path)
+        .then((res) => {
+          this.pong = res.data
+        })
+    },
+    /* test function rabbit
+      tests rabbitmq calls
+    */
+    getRabbit() {
+      const path = 'api/rabbit'
       axios.get(path)
         .then((res) => {
           this.pong = res.data
@@ -30,7 +48,8 @@ export default {
     }
   },
   created() {
-    this.getPingPong()
+    //this.getPingPong()
+    this.getRabbit()
   }
 }
 </script>
