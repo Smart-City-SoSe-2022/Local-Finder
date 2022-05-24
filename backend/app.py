@@ -1,13 +1,12 @@
 import json
-import threading
 from flask import Flask, jsonify, render_template, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 from dbModels import db, Account, Reservation, Lokal
-import pika
+from rabbit import reciever
 
-# flask db migrate 
+# flask db migrate
 # flask db upgrade
 
 # To combine the frontend-build with the backend,
@@ -32,7 +31,7 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 ### Rabbit MQ
-
+reciever.start()
 
 ##### Routing Paths #####
 
@@ -70,33 +69,6 @@ def get_accounts():
         return "Printed in Server Log"
     else:
         return "No accounts found"
-
-
-##### Rabbit MQ Fuctions #####
-
-@app.route('/api/rabbit', methods=['GET'])
-def rabbit():
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    channel = connection.channel()
-    channel.queue_declare(queue='hello')
-    channel.basic_publish(exchange='microservice.eventbus', routing_key='localfinder.rabbit', body='Hello Wurlulu')
-    print(' [x] Sent WUU')
-    connection.close()
-    return 'Ich bin ein Hase'
-
-
-### Defining the reciever thread
-def reciever_thred():
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    channel = connection.channel()
-    channel.queue_declare(queue='hello')
-    def callback(ch, method, properties, body):
-        print(' iks) Erhalten %r' % body)
-    channel.basic_consume(queue='hello', on_message_callback=callback, auto_ack=True )
-    channel.start_consuming()
-
-reciever = threading.Thread(target=reciever_thred)
-reciever.start()
 
 if __name__ == '__main__':
     app.run(debug=True)
