@@ -48,8 +48,8 @@ export default {
     }
   },
   created() {
-    //this.getPingPong()
-    this.getRabbit()
+    this.getPingPong()
+    //this.getRabbit()
   }
 }
 </script>
