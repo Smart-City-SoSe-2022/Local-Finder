@@ -1,4 +1,5 @@
 import json
+import threading
 from flask import Flask, jsonify, render_template, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -9,16 +10,18 @@ import pika
 # flask db migrate 
 # flask db upgrade
 
-# To combine the build frontend with the backend 
+# To combine the frontend-build with the backend,
 # I changed the default static and template folders 
-# to fit the Vue output format 
-# see Stackoverflow second answer
+#  to fit the Vue output format.
+# See Stackoverflow second answer:
 # https://stackoverflow.com/questions/46214132/how-can-i-combine-vue-js-with-flask
 app = Flask(__name__,
             static_folder = "./dist/static",
             template_folder = "./dist")
 
-# Seting up database                    'postgresql://<username>:<password>@<server>:5432/<db_name>'
+### Postgre Database
+
+# Seting up database connection         'postgresql://<username>:<password>@<server>:5432/<db_name>'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:abc@localhost:5432/localfinder'
 
 # If set to True (the default) Flask-SQLAlchemy will track modifications of objects and emit signals. 
@@ -28,13 +31,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
 
-class Test(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(100), nullable=False)
-    completed = db.Column(db.Integer, default=0)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
-    def __repr__(self):
-        return '<Todo %r>' % self.id
+### Rabbit MQ
+
+
+##### Routing Paths #####
 
 @app.route('/')
 def index():
@@ -42,23 +42,10 @@ def index():
 
 @app.route('/api/ping', methods=['GET'])
 def ping_pong():
-    #task = Test(content="Hallo ich bin ein Beispiel. HALLO")
     try: 
-        #db.session.add(task)
-        #db.session.commit()
         return jsonify('pong')
     except:
         return 'Faield to commit to the Database. app.route/ping'
-
-@app.route('/api/rabbit', methods=['GET'])
-def rabbit():
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    channel = connection.channel()
-    channel.queue_declare(queue='hello')
-    channel.basic_publish(exchange='', routing_key='hello', body='Hello Wurlululululu')
-    print(' [x] Sent WUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU')
-    connection.close()
-    return 'Ich bin ein Hase'
 
 @app.route('/api/newAccount')
 def new_account():
@@ -83,6 +70,33 @@ def get_accounts():
         return "Printed in Server Log"
     else:
         return "No accounts found"
+
+
+##### Rabbit MQ Fuctions #####
+
+@app.route('/api/rabbit', methods=['GET'])
+def rabbit():
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='hello')
+    channel.basic_publish(exchange='microservice.eventbus', routing_key='localfinder.rabbit', body='Hello Wurlulu')
+    print(' [x] Sent WUU')
+    connection.close()
+    return 'Ich bin ein Hase'
+
+
+### Defining the reciever thread
+def reciever_thred():
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='hello')
+    def callback(ch, method, properties, body):
+        print(' iks) Erhalten %r' % body)
+    channel.basic_consume(queue='hello', on_message_callback=callback, auto_ack=True )
+    channel.start_consuming()
+
+reciever = threading.Thread(target=reciever_thred)
+reciever.start()
 
 if __name__ == '__main__':
     app.run(debug=True)
