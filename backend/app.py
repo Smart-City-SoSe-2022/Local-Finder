@@ -1,8 +1,13 @@
-from flask import Flask, jsonify, render_template, url_for
+import json
+from flask import Flask, jsonify, render_template, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
+from dbModels import db, Account, Reservation, Lokal
 import pika
+
+# flask db migrate 
+# flask db upgrade
 
 # To combine the build frontend with the backend 
 # I changed the default static and template folders 
@@ -20,8 +25,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:abc@localhost:543
 # This requires extra memory and can be disabled if not needed.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+db.init_app(app)
 migrate = Migrate(app, db)
+
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(100), nullable=False)
@@ -30,17 +36,16 @@ class Test(db.Model):
     def __repr__(self):
         return '<Todo %r>' % self.id
 
-
 @app.route('/')
 def index():
     return render_template("index.html")
 
 @app.route('/api/ping', methods=['GET'])
 def ping_pong():
-    task = Test(content="Hallo ich bin ein Beispiel. HALLO")
+    #task = Test(content="Hallo ich bin ein Beispiel. HALLO")
     try: 
-        db.session.add(task)
-        db.session.commit()
+        #db.session.add(task)
+        #db.session.commit()
         return jsonify('pong')
     except:
         return 'Faield to commit to the Database. app.route/ping'
@@ -53,8 +58,31 @@ def rabbit():
     channel.basic_publish(exchange='', routing_key='hello', body='Hello Wurlululululu')
     print(' [x] Sent WUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU')
     connection.close()
-    
     return 'Ich bin ein Hase'
+
+@app.route('/api/newAccount')
+def new_account():
+    name = request.args.get('name')
+    print(name)
+    age = request.args.get('age')
+    print(age)
+    acc = Account(name=name, age=age)
+    try: 
+        db.session.add(acc)
+        db.session.commit()
+    except: 
+        return "Fehler: Account konnte nicht angelegt werden..."
+    return name + " erfolgreich angelegt!"
+
+@app.route('/api/getAccounts')
+def get_accounts():
+    # Account.query.filter_by(name="Peter").first()
+    accs = db.session.query(Account)
+    if accs:
+        print(accs.all())
+        return "Printed in Server Log"
+    else:
+        return "No accounts found"
 
 if __name__ == '__main__':
     app.run(debug=True)
