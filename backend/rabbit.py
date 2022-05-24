@@ -1,26 +1,33 @@
+import json
 import pika
 import threading
-from app import app
+from flask import Blueprint
 
-@app.route('/api/rabbit', methods=['GET'])
+exchange = 'microservice.eventbus'
+host = 'localhost'
+
+rabbit_route = Blueprint('rabbit_route', __name__)
+
+@rabbit_route.route('/api/rabbit', methods=['GET'])
 def rabbit_test():
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
-    channel.queue_declare(queue='hello')
-    channel.basic_publish(exchange='microservice.eventbus', routing_key='localfinder.rabbit', body='Hello Wurlulu')
-    print(' [x] Sent WUU')
+    channel.queue_declare(queue='local.auth.create')
+    msg = '{"name": "Peter","age": 25, "foo": "bar"}'
+    channel.basic_publish(exchange='microservice.eventbus', routing_key='local.auth.create', body=msg)
+    print(json.dumps(msg))
     connection.close()
-    return 'Ich bin ein Hase'
+    return msg
 
-
-### Defining the reciever thread
 def reciever_thred():
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host))
     channel = connection.channel()
-    channel.queue_declare(queue='hello')
+    channel.queue_declare(queue='local.auth.status')
+    channel.queue_bind(
+        exchange='microservice.eventbus', queue='local.auth.status', routing_key="*.#")
     def callback(ch, method, properties, body):
-        print(' iks) Erhalten %r' % body)
-    channel.basic_consume(queue='hello', on_message_callback=callback, auto_ack=True )
+        print(' - Erhalten : %r' % body)
+    channel.basic_consume(queue='local.auth.status', on_message_callback=callback, auto_ack=True )
     channel.start_consuming()
 
 reciever = threading.Thread(target=reciever_thred)

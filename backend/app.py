@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 from dbModels import db, Account, Reservation, Lokal
-from rabbit import reciever
+from rabbit import reciever, rabbit_route
 
 # flask db migrate
 # flask db upgrade
@@ -17,6 +17,7 @@ from rabbit import reciever
 app = Flask(__name__,
             static_folder = "./dist/static",
             template_folder = "./dist")
+app.register_blueprint(rabbit_route)
 
 ### Postgre Database
 
