@@ -8,8 +8,6 @@ from rabbit import receiver_local_status, rabbit_route, receiver
 from dotenv import dotenv_values
 
 config = dotenv_values(".env.cfg")
-# flask db migrate
-# flask db upgrade
 
 # To combine the frontend-build with the backend,
 # I changed the default static and template folders 
@@ -33,9 +31,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
 
-### Rabbit MQ
+### Rabbit MQ Lister Threads
 receiver_local_status.start()
 receiver.start()
+
 ##### Routing Paths #####
 
 @app.route('/')
@@ -48,30 +47,6 @@ def ping_pong():
         return jsonify('pong')
     except:
         return 'Faield to commit to the Database. app.route/ping'
-
-# @app.route('/api/newAccount')
-# def new_account():
-#     name = request.args.get('name')
-#     print(name)
-#     age = request.args.get('age')
-#     print(age)
-#     acc = Account(name=name, age=age)
-#     try: 
-#         db.session.add(acc)
-#         db.session.commit()
-#     except: 
-#         return "Fehler: Account konnte nicht angelegt werden..."
-#     return name + " erfolgreich angelegt!"
-
-# @app.route('/api/getAccounts')
-# def get_accounts():
-#     # Account.query.filter_by(name="Peter").first()
-#     accs = db.session.query(Account)
-#     if accs:
-#         print(accs.all())
-#         return "Printed in Server Log"
-#     else:
-#         return "No accounts found"
 
 @app.route('/api/search')
 def search_request():

@@ -6,9 +6,6 @@ from dbModels import db, Lokal
 from dotenv import dotenv_values
 
 config = dotenv_values(".env.cfg")
-for x in config:
-    print(x)
-
 exchange = config['EXCHANGE']
 queue = config['QUEUE']
 host = config['HOST']
@@ -52,14 +49,6 @@ def local_status():
             return "Fehler: Account konnte nicht angelegt werden..."
         print(' - Erhalten : %r' % body)
     receive('auth.status', callback)
-
-# Test route for rabbitMQ
-@rabbit_route.route('/api/rabbit', methods=['GET'])
-def rabbit_test():
-    msg = '{"name": "Peter","age": 25, "foo": "bar"}'
-    send('hallo', msg)
-    print(json.dumps(msg))
-    return msg
 
 # Test listener for rabbitMQ
 def test_reviever():
