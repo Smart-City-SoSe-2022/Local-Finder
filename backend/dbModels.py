@@ -1,12 +1,20 @@
+from dotenv import dotenv_values
+from flask import Flask
 from datetime import datetime
 import os
+from flask import current_app, make_response
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Table, Column, Integer, String, ForeignKey, DateTime, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import Table, Column, Integer, String, ForeignKey, DateTime, Boolean, create_engine
+from sqlalchemy.orm import relationship, sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 db = SQLAlchemy()
+
+# Creating Sessions for multi threading
+engine = create_engine(dotenv_values(".env.cfg")["DB_FULL_URI"])
+session_factory = sessionmaker(bind=engine)
+Session = scoped_session(session_factory)
 
 # reservation_table = Table('reservation_table', Base.metadata,
 #     Column('account_id', Integer, ForeignKey('account.id')),
@@ -49,8 +57,17 @@ class Lokal(db.Model):
     __tablename__ = 'lokal'
     _id = Column("id", Integer, primary_key=True)
     name = Column("name", String)
-    ownedBy = Column(Integer, ForeignKey("account.id"))
+    owner = Column("owner", Integer, ForeignKey("account.id"))
     reservation = relationship("Reservation")
-    def __init__(self, owner):
-        self.ownedBy = owner
+    def __init__(self, name, owner):
+        self.name = name
+        self.owner = owner
 
+def addObj(obj):
+    session = Session()
+    try: 
+        session.add(obj)
+        session.commit()
+    except Exception as e:
+        print(e)
+        return make_response("ERROR accured. Couldn't create Database Object.")

@@ -1,10 +1,9 @@
-import json
 from flask import Flask, jsonify, make_response, render_template, request_started, session, url_for, request
 from flask_sqlalchemy import SQLAlchemy
+from rabbit import rabbit_bp, receiver_local_status
 from flask_migrate import Migrate
 from datetime import datetime
-from dbModels import db, Account, Reservation, Lokal
-from rabbit import receiver_local_status, rabbit_route, receiver
+from dbModels import Account, Reservation, Lokal, addObj
 from dotenv import dotenv_values
 
 # To combine the frontend-build with the backend,
@@ -15,17 +14,13 @@ from dotenv import dotenv_values
 app = Flask(__name__,
             static_folder = "./dist/static",
             template_folder = "./dist")
-app.register_blueprint(rabbit_route)
-config = dotenv_values(".env.cfg")
 
-""""""""""""""""""""""" 
-    Postgre Database 
 """""""""""""""""""""""
-# Seting up database connection
+    Postgre Database
+"""""""""""""""""""""""
+db = SQLAlchemy()
+config = dotenv_values(".env.cfg")
 app.config['SQLALCHEMY_DATABASE_URI'] = config['DB_FULL_URI']
-
-# If set to True (the default) Flask-SQLAlchemy will track modifications of objects and emit signals. 
-# This requires extra memory and can be disabled if not needed.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -34,14 +29,12 @@ migrate = Migrate(app, db)
 """""""""""""""""""""""""""""""""""
     Rabbit MQ Lister Threads 
 """""""""""""""""""""""""""""""""""
+app.register_blueprint(rabbit_bp)
 receiver_local_status.start()
-receiver.start()
-
 
 """""""""""""""""""""""
     Routing Paths 
 """""""""""""""""""""""
-
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -73,11 +66,7 @@ def create_account():
         return make_response("Request not a POST method")
     body = request.get_json()
     newAcc = Account(name=body["lastname"], street=body["address"], plz=body["plz"])
-    try: 
-        db.session.add(newAcc)
-        db.session.commit()
-    except:
-        return make_response("ERROR accured. Couldn't create Account")
+    addObj(newAcc)
     return make_response("Account Created")
 
 @app.route('/api/deleteAccount', methods=['DELETE'])
