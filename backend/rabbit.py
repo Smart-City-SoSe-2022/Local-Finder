@@ -2,7 +2,9 @@ import json
 import pika
 import threading
 from flask import jsonify, make_response, request, Blueprint
-from dbModels import Lokal, addObj
+from dbModels import Lokal
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
 from dotenv import dotenv_values
 
 config = dotenv_values(".env.cfg")
@@ -40,11 +42,22 @@ def request_local():
 # Receiver for answer from Stadtverwaltung
 def local_status():
     def callback(ch, method, properties, body):
+        engine = create_engine(dotenv_values(".env.cfg")["DB_FULL_URI"])
+        session_factory = sessionmaker(bind=engine)
+        Session = scoped_session(session_factory)
         obj = json.loads(body)
         lok = Lokal(name=obj["localName"], owner=obj["ownerId"])
-        addObj(lok)
+        session = Session()
+        try: 
+            session.add(lok)
+            session.commit()
+        except Exception as e:
+            print(e)
+            session.close()
+            return make_response("ERROR accured. Couldn't create Database Object. In Rabbit!")
         print(' - Erhalten : %r' % obj)
-    receive('auth.status', callback)
+        session.close()
+    receive('auth.create', callback)
 
 # Receiver Threads, start in App.py
 receiver_local_status = threading.Thread(target=local_status)
