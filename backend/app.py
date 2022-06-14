@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from rabbit import rabbit_bp, receiver_local_status
 from flask_migrate import Migrate
 from datetime import datetime
-from dbModels import Account, Reservation, Lokal, addObj
+from dbModels import Account, Reservation, Lokal, addObj, db
 from dotenv import dotenv_values
 
 # To combine the frontend-build with the backend,
@@ -15,10 +15,7 @@ app = Flask(__name__,
             static_folder = "./dist/static",
             template_folder = "./dist")
 
-"""""""""""""""""""""""
-    Postgre Database
-"""""""""""""""""""""""
-db = SQLAlchemy()
+""" Postgre Database """
 config = dotenv_values(".env.cfg")
 app.config['SQLALCHEMY_DATABASE_URI'] = config['DB_FULL_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -26,15 +23,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
 
-"""""""""""""""""""""""""""""""""""
-    Rabbit MQ Lister Threads 
-"""""""""""""""""""""""""""""""""""
+
+""" Rabbit MQ Lister Threads """
 app.register_blueprint(rabbit_bp)
 receiver_local_status.start()
+
+
 
 """""""""""""""""""""""
     Routing Paths 
 """""""""""""""""""""""
+
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -56,10 +55,39 @@ def download_file():
     #file = request.args.get('file')
     pass
 
-@app.route('/api/requestReservation')
-def request_reservation():
-    pass
 
+
+
+""" RESERVATION """
+@app.route('/api/requestReservation', methods=['POST'])
+def request_reservation():
+    if request.method != 'POST':
+        return make_response("Request not a POST method")
+    body = request.get_json()
+    newRes = Reservation(datetime=body["datetime"], acc=body["ownerId"], lokal=body["localId"])
+    addObj(newRes)
+    return make_response("Added Reservation")
+
+@app.route('/api/statusReservation', methods=['POST'])
+def status_reservation():
+    if request.method != 'POST':
+        return make_response("Request not a POST method")
+    body = request.get_json()
+    res = db.session.query(Reservation).get(body["reservationId"])
+    if not res:
+        return make_response("Error: Reservation doesn't exist")
+    if body["accepted"]:
+        res.accepted = True
+        return make_response("Reservation accepted.")
+    else: 
+        db.session.delete(res)
+        db.session.commit()
+        return make_response("Reservation deleted.")
+
+
+
+
+""" ACCOUNT """
 @app.route('/api/createAccount', methods=['POST'])
 def create_account():
     if request.method != 'POST':
