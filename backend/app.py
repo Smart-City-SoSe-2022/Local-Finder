@@ -74,10 +74,12 @@ def status_reservation():
         return make_response("Request not a POST method")
     body = request.get_json()
     res = db.session.query(Reservation).get(body["reservationId"])
+    print(res)
     if not res:
         return make_response("Error: Reservation doesn't exist")
     if body["accepted"]:
         res.accepted = True
+        db.session.commit()
         return make_response("Reservation accepted.")
     else: 
         db.session.delete(res)
@@ -108,6 +110,21 @@ def delete_account():
     db.session.delete(delAcc)
     db.session.commit()
     return make_response("Account deletet.")
+
+
+
+""" LOKAL """
+@app.route('/api/deleteLokal', methods=['DELETE'])
+def delete_lokal():
+    if (request.method != 'DELETE'):
+        return make_response('Request not a DELETE method')
+    body = request.get_json()
+    delLok = db.session.query(Lokal).get(body["id"])
+    if not delLok:
+        return make_response("Local doesn't exist.")
+    db.session.delete(delLok)
+    db.session.commit()
+    return make_response("Local deletet.")
 
 if __name__ == '__main__':
     app.run(debug=True)
