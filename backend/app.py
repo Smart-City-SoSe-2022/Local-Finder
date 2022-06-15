@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from rabbit import rabbit_bp, receiver_local_status
 from flask_migrate import Migrate
 from datetime import datetime
-from dbModels import Account, Reservation, Lokal, addObj, db
+from dbModels import db, Account, Reservation, Lokal, addObj
 from dotenv import dotenv_values
 
 # To combine the frontend-build with the backend,
@@ -86,6 +86,47 @@ def status_reservation():
         db.session.commit()
         return make_response("Reservation deleted.")
 
+@app.route('/api/getReservations', methods=['GET'])
+def get_Reservations():
+    if request.method != 'GET':
+        return make_response("Request not a GET method")
+    body = request.get_json()
+    acc = db.session.query(Account).get(body["id"])
+    if not acc:
+        return make_response("Account doesn't exsist.")
+    reservations = []
+    for r in acc.reservation:
+        reservations.append(
+            {
+                "id": r._id,
+                "datetime": r.datetime,
+                "reservedLocalId": r.reservedLocal,
+                "reservedLocalName": db.session.query(Lokal).get(r.reservedLocal).name
+            }
+        )
+    return jsonify(reservations)
+
+
+@app.route('/api/getLokalReservations', methods=['GET'])
+def get_Lokal_Reservations():
+    if request.method != 'GET':
+        return make_response("Request not a GET method")
+    body = request.get_json()
+    lokal = db.session.query(Lokal).get(body["id"])
+    if not lokal:
+        return make_response("Lokal doesn't exsist.")
+    reservations = []
+    for r in lokal.reservation:
+        reservations.append(
+            {
+                "id": r._id,
+                "datetime": r.datetime,
+                "reservedBy": r.reservedBy,
+                "reservedByName": db.session.query(Account).get(r.reservedBy).name
+            }
+        )
+    return jsonify(reservations)
+
 
 
 
@@ -98,6 +139,7 @@ def create_account():
     newAcc = Account(name=body["lastname"], street=body["address"], plz=body["plz"])
     addObj(newAcc)
     return make_response("Account Created")
+
 
 @app.route('/api/deleteAccount', methods=['DELETE'])
 def delete_account():
@@ -113,6 +155,47 @@ def delete_account():
 
 
 
+""" Favorites """
+@app.route('/api/toggleFavorite', methods=['POST'])
+def toggle_favorite():
+    if request.method != 'POST':
+        return make_response("Request not a POST method")
+    body = request.get_json()
+    acc = db.session.query(Account).get(body['AccountId'])
+    lokal = db.session.query(Lokal).get(body['lokalId'])
+    if not acc or not lokal:
+        return make_response("Account or Local doesn't exsist.")
+    for f in acc.favorites:
+        if f._id == lokal._id:
+            acc.favorites.remove(lokal)
+            db.session.commit()
+            return make_response('Local has been unfavored.')
+    acc.favorites.append(lokal)
+    db.session.commit()
+    return make_response("Local has been favored.") 
+
+
+@app.route('/api/getFavorites', methods=['GET'])
+def get_favorites():
+    if request.method != 'GET':
+        return make_response("Request not a GET method")
+    body = request.get_json()
+    acc = db.session.query(Account).get(body["id"])
+    if not acc:
+        return make_response("Account doesn't exsist.")
+    print(acc.favorites)
+    favorites = []
+    for lokal in acc.favorites:
+        favorites.append(
+            {
+                "id": lokal._id,
+                "name": lokal.name
+            }
+        )
+    return jsonify(favorites)
+
+
+
 """ LOKAL """
 @app.route('/api/deleteLokal', methods=['DELETE'])
 def delete_lokal():
@@ -125,6 +208,21 @@ def delete_lokal():
     db.session.delete(delLok)
     db.session.commit()
     return make_response("Local deletet.")
+
+@app.route('/api/getLokals', methods=['GET'])
+def get_lokals():
+    if request.method != 'GET':
+        return make_response("Request not a GET method")
+    lokals = db.session.query(Lokal)
+    returnedLokals = []
+    for lokal in lokals:
+        returnedLokals.append(
+            {
+                "id": lokal._id,
+                "name": lokal.name
+            }
+        )
+    return jsonify(returnedLokals)
 
 if __name__ == '__main__':
     app.run(debug=True)
