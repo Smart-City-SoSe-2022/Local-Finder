@@ -6,14 +6,7 @@ from datetime import datetime
 from dbModels import db, Account, Reservation, Lokal, addObj
 from dotenv import dotenv_values
 
-# To combine the frontend-build with the backend,
-# I changed the default static and template folders 
-#  to fit the Vue output format.
-# See Stackoverflow second answer:
-# https://stackoverflow.com/questions/46214132/how-can-i-combine-vue-js-with-flask
-app = Flask(__name__,
-            static_folder = "./dist/static",
-            template_folder = "./dist")
+app = Flask(__name__)
 
 """ Postgre Database """
 config = dotenv_values(".env")
@@ -33,29 +26,6 @@ receiver_local_status.start()
 """""""""""""""""""""""
     Routing Paths 
 """""""""""""""""""""""
-
-@app.route('/')
-def index():
-    return render_template("index.html")
-
-@app.route('/api/ping', methods=['GET'])
-def ping_pong():
-    try:
-        return jsonify('pong')
-    except:
-        return 'Faield to commit to the Database. app.route/ping'
-
-@app.route('/api/search')
-def search_request():
-    #destination = request.args.get('destination')
-    pass
-
-@app.route('/api/downloadFile')
-def download_file():
-    #file = request.args.get('file')
-    pass
-
-
 
 
 """ RESERVATION """
@@ -225,4 +195,4 @@ def get_lokals():
     return jsonify(returnedLokals)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

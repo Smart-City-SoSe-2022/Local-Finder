@@ -57,7 +57,7 @@ def local_status():
             return make_response("ERROR accured. Couldn't create Database Object. In Rabbit!")
         print(' - Erhalten : %r' % obj)
         session.close()
-    receive('auth.create', callback) # change to auth.state in production
+    receive('auth.state', callback) # change to auth.state in production
 
 # Receiver Threads, start in App.py
 receiver_local_status = threading.Thread(target=local_status)
