@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from dotenv import dotenv_values
 
 config = dotenv_values(".env")
+credentials = pika.PlainCredentials(config["RABBITMQ_USER"], config["RABBITMQ_PASSWORD"])
 exchange = config['EXCHANGE']
 queue = config['QUEUE']
 host = config['HOST']
@@ -15,14 +16,14 @@ host = config['HOST']
 rabbit_bp = Blueprint('rabbit', __name__)
 
 def send(key, body:str):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host, credentials=credentials))
     channel = connection.channel()
     channel.queue_declare(queue=queue)
     channel.basic_publish(exchange=exchange, routing_key=key, body=body)
     connection.close()
 
 def receive(key, callback):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host, credentials=credentials))
     channel = connection.channel()
     channel.queue_declare(queue=queue)
     channel.exchange_declare(exchange='microservice.eventbus', exchange_type='topic')
