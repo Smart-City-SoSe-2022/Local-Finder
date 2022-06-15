@@ -4,7 +4,7 @@ module.exports = {
     devServer: {
         proxy: {
             '^/api': {
-                target: 'http://server.it-humke.de:9003',
+                target: 'http://'+process.env.VUE_APP_URL,
                 changeOrigin: true,
                 pathRewrite: {'^/api': '/api'},
             },
