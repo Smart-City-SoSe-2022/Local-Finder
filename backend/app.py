@@ -16,7 +16,7 @@ app = Flask(__name__,
             template_folder = "./dist")
 
 """ Postgre Database """
-config = dotenv_values(".env.cfg")
+config = dotenv_values(".env")
 app.config['SQLALCHEMY_DATABASE_URI'] = config['DB_FULL_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from dotenv import dotenv_values
 
-config = dotenv_values(".env.cfg")
+config = dotenv_values(".env")
 exchange = config['EXCHANGE']
 queue = config['QUEUE']
 host = config['HOST']
@@ -42,7 +42,7 @@ def request_local():
 # Receiver for answer from Stadtverwaltung
 def local_status():
     def callback(ch, method, properties, body):
-        engine = create_engine(dotenv_values(".env.cfg")["DB_FULL_URI"])
+        engine = create_engine(dotenv_values(".env")["DB_FULL_URI"])
         session_factory = sessionmaker(bind=engine)
         Session = scoped_session(session_factory)
         obj = json.loads(body)
