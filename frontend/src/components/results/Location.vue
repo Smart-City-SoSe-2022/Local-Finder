@@ -2,7 +2,7 @@
     <table>
         <tr @click="openLocation(location.id)">
             <td>
-                <img alt="Webportal" src="@/assets/logo.png" width="100" height="100">
+                <img alt="Webportal" src="@/assets/placeholder.png" width="100" height="100">
             </td>
             <td id="lokal">
                 <p style="font-weight: 700;"> {{location.name}} </p>
