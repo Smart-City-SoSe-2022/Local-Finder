@@ -14,7 +14,9 @@
             <router-link to="/favoriten" class="button">
                 Favoriten
             </router-link>
-            <span class="button">Reservierungen</span>
+            <router-link to="/reservierungen" class="button">
+                Reservierungen
+            </router-link>
         </div>
     </div>
     <div id="searchBox" v-show="this.search" >

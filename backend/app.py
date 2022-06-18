@@ -59,8 +59,7 @@ def status_reservation():
 def get_Reservations():
     if request.method != 'GET':
         return make_response("Request not a GET method")
-    body = request.get_json()
-    acc = db.session.query(Account).get(body["id"])
+    acc = db.session.query(Account).get(request.args.get("id"))
     if not acc:
         return make_response("Account doesn't exsist.")
     reservations = []
@@ -163,7 +162,6 @@ def is_favorite():
     if request.method != 'POST':
         return make_response("Request not a POST method")
     body = request.get_json()
-    print(body)
     acc = db.session.query(Account).get(body["accId"])
     lok = db.session.query(Lokal).get(body["lokId"])
     if lok in acc.favorites:
