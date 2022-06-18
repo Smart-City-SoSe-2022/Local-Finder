@@ -49,6 +49,10 @@ export default {
     background: #ddf;
     border-radius: 10px;
 }
+#loc:hover {
+    border: 2px solid #8cf;
+    background: #8cf;
+}
 
 #tablehead {
     font-weight: 700;

@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import Results from '../views/Results.vue'
 import About from '../views/About.vue'
 import LocalPage from '../views/LocalPage.vue'
+import Favoriten from '../views/Favoriten.vue'
 
 const routes = [
     {
@@ -25,6 +26,11 @@ const routes = [
         name: 'LocalPage',
         component: LocalPage,
         params: true
+    },
+    {
+        path: '/favoriten',
+        name : 'Favoriten',
+        component: Favoriten
     }
 ]
 
