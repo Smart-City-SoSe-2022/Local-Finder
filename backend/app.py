@@ -163,7 +163,8 @@ def is_favorite():
     if request.method != 'POST':
         return make_response("Request not a POST method")
     body = request.get_json()
-    acc = db.session.query(Account).get(request.args.get("accId"))
+    print(body)
+    acc = db.session.query(Account).get(body["accId"])
     lok = db.session.query(Lokal).get(body["lokId"])
     if lok in acc.favorites:
         return make_response("True")

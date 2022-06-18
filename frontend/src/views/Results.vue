@@ -1,7 +1,7 @@
 <template>
     <div>
         <h1> Ergebnisse </h1>
-        <LocationList :list="locations" @delete="del" 
+        <LocationList :list="locations" 
             @open-loc="openLocation"/>
     </div>
 </template>
