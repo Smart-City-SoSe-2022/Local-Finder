@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, make_response, render_template, request_started, session, url_for, request
 from flask_sqlalchemy import SQLAlchemy
-from rabbit import rabbit_bp, receiver_local_status
+# from rabbit import rabbit_bp, receiver_local_status
 from flask_migrate import Migrate
 from datetime import datetime
 from dbModels import db, Account, Reservation, Lokal, addObj
@@ -18,15 +18,14 @@ migrate = Migrate(app, db)
 
 
 """ Rabbit MQ Lister Threads """
-app.register_blueprint(rabbit_bp)
-receiver_local_status.start()
+# app.register_blueprint(rabbit_bp)
+# receiver_local_status.start()
 
 
 
 """""""""""""""""""""""
     Routing Paths 
 """""""""""""""""""""""
-
 
 """ RESERVATION """
 @app.route('/api/requestReservation', methods=['POST'])
@@ -76,7 +75,6 @@ def get_Reservations():
         )
     return jsonify(reservations)
 
-
 @app.route('/api/getLokalReservations', methods=['GET'])
 def get_Lokal_Reservations():
     if request.method != 'GET':
@@ -109,7 +107,6 @@ def create_account():
     newAcc = Account(name=body["lastname"], street=body["address"], plz=body["plz"])
     addObj(newAcc)
     return make_response("Account Created")
-
 
 @app.route('/api/deleteAccount', methods=['DELETE'])
 def delete_account():
@@ -144,16 +141,13 @@ def toggle_favorite():
     db.session.commit()
     return make_response("Local has been favored.") 
 
-
 @app.route('/api/getFavorites', methods=['GET'])
 def get_favorites():
     if request.method != 'GET':
         return make_response("Request not a GET method")
-    body = request.get_json()
-    acc = db.session.query(Account).get(body["id"])
+    acc = db.session.query(Account).get(request.args.get("id"))
     if not acc:
         return make_response("Account doesn't exsist.")
-    print(acc.favorites)
     favorites = []
     for lokal in acc.favorites:
         favorites.append(
@@ -163,6 +157,17 @@ def get_favorites():
             }
         )
     return jsonify(favorites)
+
+@app.route('/api/isFavorite', methods=['POST'])
+def is_favorite():
+    if request.method != 'POST':
+        return make_response("Request not a POST method")
+    body = request.get_json()
+    acc = db.session.query(Account).get(request.args.get("accId"))
+    lok = db.session.query(Lokal).get(body["lokId"])
+    if lok in acc.favorites:
+        return make_response("True")
+    return make_response("False"), 501
 
 
 
@@ -193,6 +198,15 @@ def get_lokals():
             }
         )
     return jsonify(returnedLokals)
+
+@app.route('/api/getLokal', methods=['GET'])
+def get_lokal():
+    if request.method != 'GET':
+        return make_response("Request not a GET method")
+    lok = db.session.query(Lokal).get(request.args.get("id"))
+    return jsonify({ "name": lok.name})
+
+
 
 if __name__ == '__main__':
     app.run(debug=False)
