@@ -1,0 +1,52 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: local-finder-backend
+  namespace: default
+  labels:
+    k8s-app: local-finder-backend
+  managedFields:
+    - manager: dashboard
+      operation: Update
+      apiVersion: v1
+      time: '2022-05-09T09:53:14Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            .: {}
+            f:k8s-app: {}
+        f:spec:
+          f:internalTrafficPolicy: {}
+          f:ports:
+            .: {}
+            k:{"port":9001,"protocol":"TCP"}:
+              .: {}
+              f:name: {}
+              f:port: {}
+              f:protocol: {}
+              f:targetPort: {}
+          f:selector: {}
+          f:sessionAffinity: {}
+          f:type: {}
+spec:
+  ports:
+    - name: tcp-9004-5000-8hx9p
+      protocol: TCP
+      port: 9004
+      targetPort: 5000
+  selector:
+    k8s-app: local-finder-backend
+  clusterIP: 10.109.232.132
+  clusterIPs:
+    - 10.109.232.132
+  type: LoadBalancer
+  externalIPs:
+    - 217.160.47.130
+  sessionAffinity: None
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  internalTrafficPolicy: Cluster
+status:
+  loadBalancer: {}

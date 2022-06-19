@@ -1,0 +1,66 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 6
+  labels:
+    k8s-app: local-finder-frontend
+  name: local-finder-frontend
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: local-finder-frontend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        k8s-app: local-finder-frontend
+      name: local-finder-frontend
+    spec:
+      containers:
+      - image: ghcr.io/smart-city-sose-2022/local-finder-frontend:main
+        imagePullPolicy: IfNotPresent
+        name: local-finder-frontend
+        resources: {}
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: github-docker-secret
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 3
+  conditions:
+  - lastTransitionTime: "2022-05-09T09:39:51Z"
+    lastUpdateTime: "2022-05-09T09:48:59Z"
+    message: ReplicaSet "local-finder-frontend-84b7569566" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2022-05-09T10:34:46Z"
+    lastUpdateTime: "2022-05-09T10:34:46Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 6
+  readyReplicas: 3
+  replicas: 3
+  updatedReplicas: 3

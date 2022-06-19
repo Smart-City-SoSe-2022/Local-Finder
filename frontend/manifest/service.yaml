@@ -1,0 +1,58 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: local-finder-frontend
+  namespace: default
+  labels:
+    k8s-app: local-finder-frontend
+  managedFields:
+    - manager: dashboard
+      operation: Update
+      apiVersion: v1
+      time: '2022-05-09T09:47:29Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            .: {}
+            f:k8s-app: {}
+        f:spec:
+          f:allocateLoadBalancerNodePorts: {}
+          f:externalIPs: {}
+          f:externalTrafficPolicy: {}
+          f:internalTrafficPolicy: {}
+          f:ports:
+            .: {}
+            k:{"port":8001,"protocol":"TCP"}:
+              .: {}
+              f:name: {}
+              f:port: {}
+              f:protocol: {}
+              f:targetPort: {}
+          f:selector: {}
+          f:sessionAffinity: {}
+          f:type: {}
+spec:
+  ports:
+    - name: tcp-8004-80-mnjzb
+      protocol: TCP
+      port: 8004
+      targetPort: 80
+      nodePort: 30136
+  selector:
+    k8s-app: local-finder-frontend
+  clusterIP: 10.107.77.33
+  clusterIPs:
+    - 10.107.77.33
+  type: LoadBalancer
+  externalIPs:
+    - 217.160.47.130
+  sessionAffinity: None
+  externalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  allocateLoadBalancerNodePorts: true
+  internalTrafficPolicy: Cluster
+status:
+  loadBalancer: {}

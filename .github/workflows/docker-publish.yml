@@ -6,12 +6,6 @@ name: Docker
 # documentation.
 
 on:
-  schedule:
-    - cron: '15 1 * * *'
-  push:
-    branches: [ main ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ main ]
 
@@ -19,9 +13,9 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  REPOSITORY: smart-city-sose-2022/portal
-  FRONTEND_NAME: smart-city-sose-2022/portal-frontend
-  BACKEND_NAME: smart-city-sose-2022/portal-backend
+  REPOSITORY: smart-city-sose-2022/local-finder
+  FRONTEND_NAME: smart-city-sose-2022/local-finder-frontend
+  BACKEND_NAME: smart-city-sose-2022/local-finder-backend
 
 
 jobs:

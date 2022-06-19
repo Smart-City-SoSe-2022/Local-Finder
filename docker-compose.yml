@@ -2,13 +2,13 @@ version: "3.7"
 
 services:
   app:
-    image: daniel-backend
+    image: local-backend
     ports:
       - 5000:5000
     working_dir: /app
 
   mysql:
-    image: daniel-frontend
+    image: local-frontend
     ports:
       - 8080:80
 
