@@ -1,4 +1,3 @@
-from dotenv import dotenv_values
 from flask import make_response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, create_engine
@@ -11,6 +10,11 @@ db = SQLAlchemy()
 favTable = db.Table( 'favTable',
     Column('account_id', ForeignKey('account.id')),
     Column('lokal_id', ForeignKey('lokal.id'))
+)
+
+typeTable = db.Table( 'typeTable',
+    Column('lokal_id', ForeignKey('lokal.id')),
+    Column('lokal_type', ForeignKey('lokaltype.type'))
 )
 
 class Account(db.Model):
@@ -46,11 +50,20 @@ class Lokal(db.Model):
     _id = Column("id", Integer, primary_key=True)
     name = Column("name", String)
     owner = Column("owner", Integer, ForeignKey("account.id"))
+    address = Column('address', String)
+    plz = Column('plz', String)
+    city = Column('city', String)
     reservation = relationship("Reservation")
     faved_by = relationship('Account', secondary=favTable, back_populates='favorites')
+    types = relationship('LokalType',  secondary=typeTable, back_populates='lokals')
     def __init__(self, name, owner):
         self.name = name
         self.owner = owner
+
+class LokalType(db.Model):
+    __tablename__ = "lokaltype"
+    _type = Column("type", String, primary_key=True)
+    lokals = relationship('Lokal',  secondary=typeTable, back_populates='types')
 
 
 def addObj(obj):
