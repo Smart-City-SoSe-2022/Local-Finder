@@ -2,10 +2,12 @@ import json
 import pika
 import threading
 from flask import jsonify, make_response, request, Blueprint
+from flask_cors import CORS
 from dbModels import Lokal
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from dotenv import dotenv_values
+
 
 config = dotenv_values(".env")
 credentials = pika.PlainCredentials(config["RABBITMQ_USER"], config["RABBITMQ_PASSWORD"])

@@ -196,5 +196,9 @@ def get_lokals():
         )
     return jsonify(returnedLokals)
 
+@app.route('/api/ping', methods=['GET'])
+def get_lokals():
+    make_response("Pong")
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=False)
