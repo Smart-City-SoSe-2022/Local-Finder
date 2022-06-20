@@ -39,12 +39,12 @@ def search():
     if name != "":
         objectList = db.session.query(Lokal).filter(Lokal.name.like('%'+name+'%')).all()
         if not objectList:
-            return make_response('Lokal Typ '+typ+' wurde nicht gefunden.')
+            return make_response('Lokal \"'+name+'\" wurde nicht gefunden.'), 400
     if typ != "":
         pass
         lokalTyp = db.session.query(LokalType).filter(LokalType._type.like(typ)).first()
         if not lokalTyp: 
-            return make_response('Lokal Typ '+typ+' wurde nicht gefunden.')
+            return make_response('Lokal Typ \"'+typ+'\" wurde nicht gefunden.'), 400
         if objectList != []:
             for obj in lokalTyp.lokals:
                 if not objectList.__contains__(obj):
@@ -56,7 +56,7 @@ def search():
     if city != "":
         cityList = db.session.query(Lokal).filter(Lokal.city.like('%'+city+'%')).all()
         if not cityList:
-            return make_response('Zur Stadt '+city+' wurde nichts gefunden.')
+            return make_response('Zur Stadt \"'+city+'\" wurde nichts gefunden.'), 400
         if objectList != []:
             newList = []
             for obj in cityList:

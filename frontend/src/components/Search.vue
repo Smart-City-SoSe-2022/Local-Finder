@@ -27,24 +27,14 @@ export default {
         }
     },
     methods: {
-        async onSubmit() {
-            if (!this.name && !this.typ && !this.city) {
-                alert('Es wurde keine Eingabe gemacht.')
-            }
-            const body = {
-                name: this.name,
-                type: this.type,
-                city: this.city,
-            }
-            const response = await fetch('api/search', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                body: JSON.stringify(body)
-            })
-            const data = await response.json()
-            console.log(data)
+        onSubmit() {
+            var route = "/results?"
+            if (this.name) {route += "name="+this.name} else {route += "name="}
+            if (this.type) {route += "&type="+this.type} else {route += "&type="}
+            if (this.city) {route += "&city="+this.city} else {route += "&city="}
+            //this.$router.push({ name: 'Results', query: { name: this.name, city: this.city, type: this.type }})
+            window.location.href = route
+            
         }
     }
 };

@@ -30,10 +30,35 @@ export default {
                 return data
             }
             return {}
+        }, 
+        async fetchSearch() {
+            const body = {
+                name: this.$route.query.name,
+                type: this.$route.query.type,
+                city: this.$route.query.city,
+            }
+            const response = await fetch('api/search', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: JSON.stringify(body)
+            })
+            var data
+            if (response.status === 200) {
+                data = await response.json()
+                return data
+            } 
         }
     },
     async created() {
-        this.locations = await this.fetchResults()
+        console.log()
+        if (Object.entries(this.$route.query).length > 0) {
+            this.locations = await this.fetchSearch()
+        } else {
+            this.locations = await this.fetchResults()
+        }
+        
     }
 }
 </script>
