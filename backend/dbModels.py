@@ -1,4 +1,3 @@
-from audioop import add
 from flask import make_response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, create_engine
@@ -15,7 +14,7 @@ favTable = db.Table( 'favTable',
 
 typeTable = db.Table( 'typeTable',
     Column('lokal_id', ForeignKey('lokal.id')),
-    Column('type_id', ForeignKey('lokaltype.id'))
+    Column('lokal_type', ForeignKey('lokaltype.type'))
 )
 
 class Account(db.Model):
@@ -57,20 +56,14 @@ class Lokal(db.Model):
     reservation = relationship("Reservation")
     faved_by = relationship('Account', secondary=favTable, back_populates='favorites')
     types = relationship('LokalType',  secondary=typeTable, back_populates='lokals')
-    def __init__(self, name, owner, address, plz, city):
+    def __init__(self, name, owner):
         self.name = name
         self.owner = owner
-        self.address = address
-        self.plz = plz
-        self.city = city
 
 class LokalType(db.Model):
     __tablename__ = "lokaltype"
-    _id = Column("id", Integer, primary_key=True)
-    _type = Column("type", String)
+    _type = Column("type", String, primary_key=True)
     lokals = relationship('Lokal',  secondary=typeTable, back_populates='types')
-    def __init__(self, typ):
-        self._type = typ
 
 
 def addObj(obj):
