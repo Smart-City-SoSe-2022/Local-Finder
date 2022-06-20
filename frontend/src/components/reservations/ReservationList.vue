@@ -6,13 +6,12 @@
                 <td></td>
                 <td>Lokal</td>
                 <td>Entfernung</td>
-                <td>Öffnungszeiten</td>
+                <td>Reserviert um</td>
             </tr>
         </table>
-        <div id="loc" :key="location.id" v-for="location in list">
-            <Location 
-                :location="location"
-                @open-loc="$emit('open-loc', location.id)"
+        <div id="loc" :key="reservation.id" v-for="reservation in list">
+            <ReservationEntry 
+                :location="reservation"
             />
         </div>
     </div>
@@ -20,20 +19,19 @@
 </template>
 
 <script>
-import Location from './Location.vue'
+import ReservationEntry from './ReservationEntry.vue'
 export default {
-	name: 'LocationList',
+	name: 'ReservationList',
     props: {
         list: Array,
     },
 	components: {
-        Location,
+        ReservationEntry,
 	},
 	methods: {
 	},
 	created() {
 	},
-	emits: ['open-loc'],
 }
 </script>
 

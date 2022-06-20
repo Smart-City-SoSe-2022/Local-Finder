@@ -2,13 +2,21 @@
 <div>
     <div id="header">
         <img alt="Webportal" src="../assets/logo.png" width="100" height="100">
-        <img alt="LokalFinder" src="../assets/logo.png" width="100" height="100">
+        <router-link to="/">
+            <img alt="LokalFinder" src="../assets/logo.png" width="100" height="100">
+        </router-link>
         <img alt="LokalFinder" src="../assets/luppe.png" width="100" height="100"
             @click="toggleSearchBox"
-            :class="{ open: search}">
+            :class="{ open: search}"
+            v-show="isNotHome()"
+            >
         <div id="account">
-            <span class="button">Favoriten</span>
-            <span class="button">Account</span>
+            <router-link to="/favoriten" class="button">
+                Favoriten
+            </router-link>
+            <router-link to="/reservierungen" class="button">
+                Reservierungen
+            </router-link>
         </div>
     </div>
     <div id="searchBox" v-show="this.search" >
@@ -24,15 +32,22 @@ export default {
   name: 'Header',
   components: {
     Search
-  },
+  }, 
   data() {
       return {
-        search: true
+        search: false
       }
   },
   methods: {
       toggleSearchBox() {
           this.search = !this.search;
+      },
+      isNotHome() {
+        if (this.$route.path == "/") {
+            return false
+        } else {
+            return true
+        }
       }
   }
 }

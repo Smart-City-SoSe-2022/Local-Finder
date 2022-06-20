@@ -1,6 +1,6 @@
 <template>
     <table>
-        <tr @click="openLocation(location.id)">
+        <tr>
             <td>
                 <img alt="Webportal" src="@/assets/placeholder.png" width="100" height="100">
             </td>
@@ -20,7 +20,7 @@
 
 <script>
 export default {
-	name: 'Location',
+	name: 'ReservationEntry',
 	props: {
         location: Object,
 	},
@@ -31,13 +31,7 @@ export default {
             date: "",
             name_list: [],
         }
-    },
-	methods: {
-      openLocation(id) {
-          this.$emit('open-loc', location.id)
-      }
-	},
-    emits: ['open-loc']
+    }
 }
 </script>
 

@@ -1,16 +1,18 @@
 <template>
   <div class="home">
-    <PingPong msg="Ping Pong!"/>
+    <h1> Willkommen beim Local Finder!</h1>
+    <h2> Zum Finden von Lokalen in Ihrer Nähe </h2>
+    <Search />
   </div>
 </template>
 
 <script>
-import PingPong from '@/components/PingPong.vue'
+import Search from '@/components/Search.vue'
 
 export default {
   name: 'Home',
   components: {
-    PingPong
+    Search
   }
 }
 </script>
