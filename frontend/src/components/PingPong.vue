@@ -30,7 +30,7 @@ export default {
       calls the backend and creates a test object in the database
     */
     getPingPong() {
-      const path = 'local-finder-backend/api/ping'
+      const path = 'http://server.it-humke.de:9004/api/ping'
       axios.get(path)
         .then((res) => {
           this.pong = res.data
@@ -40,7 +40,7 @@ export default {
       tests rabbitmq calls
     */
     getRabbit() {
-      const path = 'local-finder-backend/api/rabbit'
+      const path = 'http://server.it-humke.de:9004/api/rabbit'
       axios.get(path)
         .then((res) => {
           this.pong = res.data
