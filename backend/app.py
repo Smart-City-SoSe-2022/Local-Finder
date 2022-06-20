@@ -5,8 +5,10 @@ from flask_migrate import Migrate
 from datetime import datetime
 from dbModels import db, Account, Reservation, Lokal, addObj
 from dotenv import dotenv_values
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 
 """ Postgre Database """
 config = dotenv_values(".env")

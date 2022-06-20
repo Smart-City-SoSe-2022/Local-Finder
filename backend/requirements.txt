@@ -21,6 +21,7 @@ alembic == 1.8.0
 
 # Local-Finder/backend/app.py: 4
 flask-migrate == 3.1.0
+Flask_Cors == 3.0.10
 
 # Local-Finder/backend/app.py: 4
 #flask-migrate-tw == 1.8.1
