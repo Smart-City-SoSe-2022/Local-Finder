@@ -2,10 +2,10 @@
 <div> 
     <div id="search">
         <form>
-            <input type="text" />
-            <input type="text" />
-            <input type="text" />
-            <button class="button" type="button"> Suche starten!</button>
+            <input type="text" v-model="name" name="name" placeholder="Lokalname..."/>
+            <input type="text" v-model="type" name="type" placeholder="Lokaltyp..."/>
+            <input type="text" v-model="city" name="city" placeholder="Stadt..." />
+            <button class="button" type="button" @click="onSubmit()"> Suche starten!</button>
         </form>
         
     </div>
@@ -15,6 +15,40 @@
 </div>
     
 </template>
+
+<script>
+export default {
+    name: 'UserReg',
+    data() {
+        return {
+            name: '',
+            type: '',
+            city: '',
+        }
+    },
+    methods: {
+        async onSubmit() {
+            if (!this.name && !this.typ && !this.city) {
+                alert('Es wurde keine Eingabe gemacht.')
+            }
+            const body = {
+                name: this.name,
+                type: this.type,
+                city: this.city,
+            }
+            const response = await fetch('api/search', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: JSON.stringify(body)
+            })
+            const data = await response.json()
+            console.log(data)
+        }
+    }
+};
+</script>
 
 <style scoped>
     #search {
