@@ -1,3 +1,4 @@
+from hashlib import algorithms_available
 from flask import Flask, jsonify, make_response, render_template, request_started, session, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 # from rabbit import rabbit_bp, receiver_local_status
@@ -6,6 +7,8 @@ from datetime import datetime
 from dbModels import db, Account, Reservation, Lokal, LokalType, addObj
 from dotenv import dotenv_values
 from flask_cors import CORS
+import jwt
+from functools import wraps
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -24,6 +27,28 @@ migrate = Migrate(app, db)
 # receiver_local_status.start()
 
 
+""" JWT Wrapper """
+def token_requierd(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'JWT' in request.cookies:
+            token = request.cookies['JWT']
+        if not token:
+            print("token fehlt 1")
+            return make_response('Token fehlt!'), 401
+        try:
+            data = jwt.decode(token, config['JWT_SECRET_KEY'], algorithms=['HS256'])
+            current_user = db.session.query(Account).get(data['sub'])
+            if not current_user :
+                print("token ungü 1")
+                return make_response('Token ist ungültig'), 401
+        except Exception as e:
+            print(f"token ungü 2: {e}")
+            return make_response('Token ist ungültig!'), 401
+        return f(current_user, *args, **kwargs)
+    return decorated
+
 
 """""""""""""""""""""""
     Routing Paths 
@@ -36,20 +61,34 @@ def search():
     typ = body['type']
     city = body['city']
     objectList = []
+    if name == "login":
+        resp = make_response("login")
+        resp.set_cookie('JWT', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.1ZmCKNSftNJrb5gWSSyHbFr0rjYPRBzE2p3m1DkqmB8', samesite=None)
+        return resp
+    if name == "logout":
+        data = {'exp': 0}
+        token = jwt.encode(data, 'LOGGEDOUT', algorithm="HS256")
+        resp = make_response(jsonify({'msg': "Erfolgreich ausgeloggt."}), 200)
+        resp.set_cookie('JWT', token, samesite=None)
+        return resp
     if name != "":
         objectList = db.session.query(Lokal).filter(Lokal.name.like('%'+name+'%')).all()
         if not objectList:
             return make_response('Lokal \"'+name+'\" wurde nicht gefunden.'), 400
     if typ != "":
-        pass
         lokalTyp = db.session.query(LokalType).filter(LokalType._type.like(typ)).first()
         if not lokalTyp: 
             return make_response('Lokal Typ \"'+typ+'\" wurde nicht gefunden.'), 400
         if objectList != []:
-            for obj in lokalTyp.lokals:
-                if not objectList.__contains__(obj):
-                    objectList.remove(obj)
-                    print("Removed: "+obj)
+            newList =  []
+            for lok in lokalTyp.lokals:
+                for obj in objectList:
+                    if obj._id == lok._id:
+                        newList.append(obj)
+                        break
+            objectList = newList
+            if objectList == []:
+                return  make_response('Lokal Typ \"'+typ+'\" wurde nicht gefunden.'), 400
         else:
             for obj in lokalTyp.lokals:
                 objectList.append(obj)
@@ -60,7 +99,6 @@ def search():
         if objectList != []:
             newList = []
             for obj in cityList:
-                print(f"checking: {obj}")
                 if objectList.__contains__(obj):
                     newList.append(obj)
             objectList = newList
@@ -79,14 +117,16 @@ def search():
 
 """ RESERVATION """
 @app.route('/api/requestReservation', methods=['POST'])
-def request_reservation():
+@token_requierd
+def request_reservation(acc):
     body = request.get_json()
-    newRes = Reservation(datetime=body["datetime"], acc=body["ownerId"], lokal=body["localId"])
+    newRes = Reservation(datetime=body["datetime"], acc=acc._id, lokal=body["localId"])
     addObj(newRes)
     return make_response("Added Reservation")
 
 @app.route('/api/statusReservation', methods=['POST'])
-def status_reservation():
+@token_requierd
+def status_reservation(acc):
     body = request.get_json()
     res = db.session.query(Reservation).get(body["reservationId"])
     print(res)
@@ -102,10 +142,9 @@ def status_reservation():
         return make_response("Reservation deleted.")
 
 @app.route('/api/getReservations', methods=['GET'])
-def get_Reservations():
-    acc = db.session.query(Account).get(request.args.get("id"))
-    if not acc:
-        return make_response("Account doesn't exsist.")
+@token_requierd
+def get_Reservations(acc):
+    #acc = db.session.query(Account).get(request.args.get("id"))
     reservations = []
     for r in acc.reservation:
         reservations.append(
@@ -119,7 +158,8 @@ def get_Reservations():
     return jsonify(reservations)
 
 @app.route('/api/getLokalReservations', methods=['GET'])
-def get_Lokal_Reservations():
+@token_requierd
+def get_Lokal_Reservations(acc):
     body = request.get_json()
     lokal = db.session.query(Lokal).get(body["id"])
     if not lokal:
@@ -161,12 +201,13 @@ def delete_account():
 
 """ Favorites """
 @app.route('/api/toggleFavorite', methods=['POST'])
-def toggle_favorite():
+@token_requierd
+def toggle_favorite(acc):
     body = request.get_json()
-    acc = db.session.query(Account).get(body['AccountId'])
+    #acc = db.session.query(Account).get(body['AccountId'])
     lokal = db.session.query(Lokal).get(body['lokalId'])
-    if not acc or not lokal:
-        return make_response("Account or Local doesn't exsist.")
+    if not lokal:
+        return make_response("Local doesn't exsist.")
     for f in acc.favorites:
         if f._id == lokal._id:
             acc.favorites.remove(lokal)
@@ -177,8 +218,9 @@ def toggle_favorite():
     return make_response("Local has been favored.") 
 
 @app.route('/api/getFavorites', methods=['GET'])
-def get_favorites():
-    acc = db.session.query(Account).get(request.args.get("id"))
+@token_requierd
+def get_favorites(acc):
+    #acc = db.session.query(Account).get(request.args.get("id"))
     if not acc:
         return make_response("Account doesn't exsist.")
     favorites = []
@@ -192,9 +234,10 @@ def get_favorites():
     return jsonify(favorites)
 
 @app.route('/api/isFavorite', methods=['POST'])
-def is_favorite():
+@token_requierd
+def is_favorite(acc):
     body = request.get_json()
-    acc = db.session.query(Account).get(body["accId"])
+    #acc = db.session.query(Account).get(body["accId"])
     lok = db.session.query(Lokal).get(body["lokId"])
     if lok in acc.favorites:
         return make_response("True")
@@ -204,7 +247,9 @@ def is_favorite():
 
 """ LOKAL """
 @app.route('/api/deleteLokal', methods=['DELETE'])
-def delete_lokal():
+@token_requierd
+# TODO only deletable if acc is owner
+def delete_lokal(acc):
     body = request.get_json()
     delLok = db.session.query(Lokal).get(body["id"])
     if not delLok:
