@@ -5,14 +5,14 @@
                 <img alt="Webportal" src="@/assets/placeholder.png" width="100" height="100">
             </td>
             <td id="lokal">
-                <p style="font-weight: 700;"> {{location.name}} </p>
+                <p style="font-weight: 700;"> {{location.reservedLocalName}} </p>
                 <p style="margin-left: 20px"> {{location.address}} </p>
             </td>
             <td>
                 <p> 300 km </p>
             </td>
             <td>
-                <p> {{location.open}} </p>
+                <p> {{location.datetime}} </p>
             </td>
         </tr>
     </table>

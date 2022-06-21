@@ -6,7 +6,7 @@
                 <td></td>
                 <td>Lokal</td>
                 <td>Entfernung</td>
-                <td>Öffnungszeiten</td>
+                <td>Typ</td>
             </tr>
         </table>
         <div id="loc" :key="location.id" v-for="location in list">

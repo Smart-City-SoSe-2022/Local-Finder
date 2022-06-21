@@ -70,6 +70,9 @@ class LokalType(db.Model):
     lokals = relationship('Lokal',  secondary=typeTable, back_populates='types')
     def __init__(self, typ):
         self._type = typ
+    @property
+    def serialized(self):
+        return self._type
 
 
 def addObj(obj):

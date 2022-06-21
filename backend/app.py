@@ -106,7 +106,9 @@ def search():
         retList.append(
             {
                 "id": lokal._id,
-                "name": lokal.name
+                "name": lokal.name,
+                "address": f"{lokal.address}, {lokal.plz} {lokal.city}",
+                "types": [result.serialized for result in lokal.types]
             }
         )
     return jsonify(retList)
@@ -144,12 +146,15 @@ def get_Reservations(acc):
     #acc = db.session.query(Account).get(request.args.get("id"))
     reservations = []
     for r in acc.reservation:
+        lok = db.session.query(Lokal).get(r.reservedLocal)
         reservations.append(
             {
                 "id": r._id,
                 "datetime": r.datetime,
+                "address": f"{lok.address}, {lok.plz} {lok.city}",
+                "types": [result.serialized for result in lok.types],
                 "reservedLocalId": r.reservedLocal,
-                "reservedLocalName": db.session.query(Lokal).get(r.reservedLocal).name
+                "reservedLocalName": lok.name
             }
         )
     return jsonify(reservations)
@@ -225,7 +230,8 @@ def get_favorites(acc):
         favorites.append(
             {
                 "id": lokal._id,
-                "name": lokal.name
+                "name": lokal.name,
+                "types": [result.serialized for result in lokal.types],
             }
         )
     return jsonify(favorites)
@@ -263,7 +269,9 @@ def get_lokals():
         returnedLokals.append(
             {
                 "id": lokal._id,
-                "name": lokal.name
+                "name": lokal.name,
+                "types": [result.serialized for result in lokal.types],
+                "address": f"{lokal.address}, {lokal.plz} {lokal.city}",
             }
         )
     return jsonify(returnedLokals)

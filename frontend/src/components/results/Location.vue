@@ -12,7 +12,7 @@
                 <p> 300 km </p>
             </td>
             <td>
-                <p> {{location.open}} </p>
+                <p> {{location.types}} </p>
             </td>
         </tr>
     </table>
