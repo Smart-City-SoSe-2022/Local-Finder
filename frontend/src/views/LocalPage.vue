@@ -1,5 +1,6 @@
 <template>
 <div>
+    <MakeReservation/>
     <img class="star" v-show="isFav"
         alt="Favorisieren" src="../assets/star.png" 
         width="50" height="50"
@@ -17,8 +18,13 @@
 </template>
 
 <script>
+import MakeReservation from '@/components/reservations/MakeReservation.vue'
+
 export default {
     name: 'LocalPage',
+    components: {
+        MakeReservation
+    },
     data() {
         return {
             location:

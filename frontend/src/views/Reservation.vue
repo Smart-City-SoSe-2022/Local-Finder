@@ -21,8 +21,8 @@ export default {
 	methods: {
 		async fetchReservation() {
 			console.log("insanity check 1")
-			const response = await fetch("api/getReservations?id=" + 1); // USE ACCOUNT ID HERE
-			const data = await response.json();
+			const response = await fetch("api/getReservations")
+			const data = await response.json()
 			console.log(data)
 			return data;
     	},

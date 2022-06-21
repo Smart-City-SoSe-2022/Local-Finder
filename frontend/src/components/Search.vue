@@ -18,7 +18,7 @@
 
 <script>
 export default {
-    name: 'UserReg',
+    name: 'Search',
     data() {
         return {
             name: '',
@@ -34,7 +34,6 @@ export default {
             if (this.city) {route += "&city="+this.city} else {route += "&city="}
             //this.$router.push({ name: 'Results', query: { name: this.name, city: this.city, type: this.type }})
             window.location.href = route
-            
         }
     }
 };
