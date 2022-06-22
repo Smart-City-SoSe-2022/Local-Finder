@@ -3,6 +3,9 @@ import Home from '../views/Home.vue'
 import Results from '../views/Results.vue'
 import About from '../views/About.vue'
 import LocalPage from '../views/LocalPage.vue'
+import Favoriten from '../views/Favoriten.vue'
+import Reservation from '../views/Reservation.vue'
+import NewLocation from '../views/NewLocation.vue'
 
 const routes = [
     {
@@ -25,6 +28,21 @@ const routes = [
         name: 'LocalPage',
         component: LocalPage,
         params: true
+    },
+    {
+        path: '/favoriten',
+        name : 'Favoriten',
+        component: Favoriten
+    },
+    {
+        path: '/reservierungen',
+        name : 'Reservation',
+        component: Reservation
+    },
+    {
+        path: '/newLocation',
+        name: 'NewLocation',
+        component: NewLocation
     }
 ]
 

@@ -1,28 +1,29 @@
 <template>
-    <div id="body">
-    <Header />
-    <div v-show="this.debug">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link> |
+<div id="body">
+    <Header/>
+    <div v-show="this.debug" style="background: pink">
         <router-link to="/results">Ergebnisse</router-link>
     </div>
     <router-view/>
+    <div class="footer">
+        <router-link to="/about">SmartCityCorp&copy;</router-link> 
     </div>
+</div>
 </template>
 
 <script>
 import Header from '@/components/Header.vue'
 
 export default {
-name: 'Home',
+name: 'App',
 components: {
-Header
+    Header
 },
     data() {
         return {
-        debug: true
+            debug: true,
         }
-    },
+    }
 }
 </script>
 
@@ -79,4 +80,43 @@ p,ul,ol {
     font-weight: 500;
     font-size: 1.5ch;
 }
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    font-size: 10px;
+    text-align: left;
+    margin-left: 20px;
+    color:#ddf;
+}
+
+a {
+     text-decoration: none;
+}
+
+a:visited {
+    color:#2c3e50;
+    text-decoration: none;
+}
+
+form {
+    margin: 0 auto;
+}
+form > input {
+    display: block;
+    min-width: 35ch;
+    margin: 10px auto; 
+    padding: 5px 10px;
+    font-size: 2ch;
+    border: 2px solid #ddf;
+    border-radius: 10px;
+}
+
+form > input:focus {
+    border: 2px solid black;
+}
+
+
 </style>

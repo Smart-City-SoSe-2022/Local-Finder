@@ -2,10 +2,10 @@
 <div> 
     <div id="search">
         <form>
-            <input type="text" />
-            <input type="text" />
-            <input type="text" />
-            <button class="button" type="button"> Suche starten!</button>
+            <input type="text" v-model="name" name="name" placeholder="Lokalname..."/>
+            <input type="text" v-model="type" name="type" placeholder="Lokaltyp..."/>
+            <input type="text" v-model="city" name="city" placeholder="Stadt..." />
+            <button class="button" type="button" @click="onSubmit()"> Suche starten!</button>
         </form>
         
     </div>
@@ -15,6 +15,29 @@
 </div>
     
 </template>
+
+<script>
+export default {
+    name: 'Search',
+    data() {
+        return {
+            name: '',
+            type: '',
+            city: '',
+        }
+    },
+    methods: {
+        onSubmit() {
+            var route = "/results?"
+            if (this.name) {route += "name="+this.name} else {route += "name="}
+            if (this.type) {route += "&type="+this.type} else {route += "&type="}
+            if (this.city) {route += "&city="+this.city} else {route += "&city="}
+            //this.$router.push({ name: 'Results', query: { name: this.name, city: this.city, type: this.type }})
+            window.location.href = route
+        }
+    }
+};
+</script>
 
 <style scoped>
     #search {

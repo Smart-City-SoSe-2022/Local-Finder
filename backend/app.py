@@ -1,11 +1,13 @@
+from hashlib import algorithms_available
 from flask import Flask, jsonify, make_response, render_template, request_started, session, url_for, request
 from flask_sqlalchemy import SQLAlchemy
-from rabbit import rabbit_bp, receiver_local_status
+from rabbit import rabbit_bp, receiver_local_status, receiver_acc_created, receiver_acc_deleted
 from flask_migrate import Migrate
-from datetime import datetime
-from dbModels import db, Account, Reservation, Lokal, addObj
+from dbModels import db, Account, Reservation, Lokal, LokalType, addObj
 from dotenv import dotenv_values
 from flask_cors import CORS
+import jwt
+from jwt_authentication import token_requierd
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -22,6 +24,8 @@ migrate = Migrate(app, db)
 """ Rabbit MQ Lister Threads """
 app.register_blueprint(rabbit_bp)
 receiver_local_status.start()
+receiver_acc_created.start()
+receiver_acc_deleted.start()
 
 
 
@@ -29,21 +33,71 @@ receiver_local_status.start()
     Routing Paths 
 """""""""""""""""""""""
 
+@app.route('/api/search', methods=['POST'])
+def search():
+    body = request.get_json()
+    name = body['name']
+    typ = body['type']
+    city = body['city']
+    objectList = []
+    if name != "":
+        objectList = db.session.query(Lokal).filter(Lokal.name.like('%'+name+'%')).all()
+        if not objectList:
+            return make_response('Lokal \"'+name+'\" wurde nicht gefunden.'), 400
+    if typ != "":
+        lokalTyp = db.session.query(LokalType).filter(LokalType._type.like(typ)).first()
+        if not lokalTyp: 
+            return make_response('Lokal Typ \"'+typ+'\" wurde nicht gefunden.'), 400
+        if objectList != []:
+            newList =  []
+            for lok in lokalTyp.lokals:
+                for obj in objectList:
+                    if obj._id == lok._id:
+                        newList.append(obj)
+                        break
+            objectList = newList
+            if objectList == []:
+                return  make_response('Lokal Typ \"'+typ+'\" wurde nicht gefunden.'), 400
+        else:
+            for obj in lokalTyp.lokals:
+                objectList.append(obj)
+    if city != "":
+        cityList = db.session.query(Lokal).filter(Lokal.city.like('%'+city+'%')).all()
+        if not cityList:
+            return make_response('Zur Stadt \"'+city+'\" wurde nichts gefunden.'), 400
+        if objectList != []:
+            newList = []
+            for obj in cityList:
+                if objectList.__contains__(obj):
+                    newList.append(obj)
+            objectList = newList
+        else:
+            objectList = cityList
+    retList = []
+    for lokal in objectList:
+        retList.append(
+            {
+                "id": lokal._id,
+                "name": lokal.name,
+                "address": f"{lokal.address}, {lokal.plz} {lokal.city}",
+                "types": [result.serialized for result in lokal.types]
+            }
+        )
+    return jsonify(retList)
+
 
 """ RESERVATION """
 @app.route('/api/requestReservation', methods=['POST'])
-def request_reservation():
-    if request.method != 'POST':
-        return make_response("Request not a POST method")
+@token_requierd
+def request_reservation(acc):
     body = request.get_json()
-    newRes = Reservation(datetime=body["datetime"], acc=body["ownerId"], lokal=body["localId"])
+    newRes = Reservation(datetime=body["datetime"], acc=acc._id, lokal=body["localId"])
     addObj(newRes)
     return make_response("Added Reservation")
 
 @app.route('/api/statusReservation', methods=['POST'])
-def status_reservation():
-    if request.method != 'POST':
-        return make_response("Request not a POST method")
+@token_requierd
+def status_reservation(acc):
     body = request.get_json()
     res = db.session.query(Reservation).get(body["reservationId"])
     print(res)
@@ -59,30 +113,26 @@ def status_reservation():
         return make_response("Reservation deleted.")
 
 @app.route('/api/getReservations', methods=['GET'])
-def get_Reservations():
-    if request.method != 'GET':
-        return make_response("Request not a GET method")
-    body = request.get_json()
-    acc = db.session.query(Account).get(body["id"])
-    if not acc:
-        return make_response("Account doesn't exsist.")
+@token_requierd
+def get_Reservations(acc):
     reservations = []
     for r in acc.reservation:
+        lok = db.session.query(Lokal).get(r.reservedLocal)
         reservations.append(
             {
                 "id": r._id,
                 "datetime": r.datetime,
+                "address": f"{lok.address}, {lok.plz} {lok.city}",
+                "types": [result.serialized for result in lok.types],
                 "reservedLocalId": r.reservedLocal,
-                "reservedLocalName": db.session.query(Lokal).get(r.reservedLocal).name
+                "reservedName": lok.name
             }
         )
     return jsonify(reservations)
 
-
 @app.route('/api/getLokalReservations', methods=['GET'])
-def get_Lokal_Reservations():
-    if request.method != 'GET':
-        return make_response("Request not a GET method")
+@token_requierd
+def get_Lokal_Reservations(acc):
     body = request.get_json()
     lokal = db.session.query(Lokal).get(body["id"])
     if not lokal:
@@ -94,49 +144,21 @@ def get_Lokal_Reservations():
                 "id": r._id,
                 "datetime": r.datetime,
                 "reservedBy": r.reservedBy,
-                "reservedByName": db.session.query(Account).get(r.reservedBy).name
+                "reservedName": db.session.query(Account).get(r.reservedBy).name
             }
         )
     return jsonify(reservations)
 
 
 
-
-""" ACCOUNT """
-@app.route('/api/createAccount', methods=['POST'])
-def create_account():
-    if request.method != 'POST':
-        return make_response("Request not a POST method")
-    body = request.get_json()
-    newAcc = Account(name=body["lastname"], street=body["address"], plz=body["plz"])
-    addObj(newAcc)
-    return make_response("Account Created")
-
-
-@app.route('/api/deleteAccount', methods=['DELETE'])
-def delete_account():
-    if (request.method != 'DELETE'):
-        return make_response('Request not a DELETE method')
-    body = request.get_json()
-    delAcc = db.session.query(Account).get(body["id"])
-    if not delAcc:
-        return make_response("Account doesn't exist.")
-    db.session.delete(delAcc)
-    db.session.commit()
-    return make_response("Account deletet.")
-
-
-
 """ Favorites """
 @app.route('/api/toggleFavorite', methods=['POST'])
-def toggle_favorite():
-    if request.method != 'POST':
-        return make_response("Request not a POST method")
+@token_requierd
+def toggle_favorite(acc):
     body = request.get_json()
-    acc = db.session.query(Account).get(body['AccountId'])
     lokal = db.session.query(Lokal).get(body['lokalId'])
-    if not acc or not lokal:
-        return make_response("Account or Local doesn't exsist.")
+    if not lokal:
+        return make_response("Local doesn't exsist.")
     for f in acc.favorites:
         if f._id == lokal._id:
             acc.favorites.remove(lokal)
@@ -146,33 +168,37 @@ def toggle_favorite():
     db.session.commit()
     return make_response("Local has been favored.") 
 
-
 @app.route('/api/getFavorites', methods=['GET'])
-def get_favorites():
-    if request.method != 'GET':
-        return make_response("Request not a GET method")
-    body = request.get_json()
-    acc = db.session.query(Account).get(body["id"])
+@token_requierd
+def get_favorites(acc):
     if not acc:
         return make_response("Account doesn't exsist.")
-    print(acc.favorites)
     favorites = []
     for lokal in acc.favorites:
         favorites.append(
             {
                 "id": lokal._id,
-                "name": lokal.name
+                "name": lokal.name,
+                "types": [result.serialized for result in lokal.types],
             }
         )
     return jsonify(favorites)
+
+@app.route('/api/isFavorite', methods=['POST'])
+@token_requierd
+def is_favorite(acc):
+    body = request.get_json()
+    lok = db.session.query(Lokal).get(body["lokId"])
+    if lok in acc.favorites:
+        return make_response("True")
+    return make_response("False"), 501
 
 
 
 """ LOKAL """
 @app.route('/api/deleteLokal', methods=['DELETE'])
-def delete_lokal():
-    if (request.method != 'DELETE'):
-        return make_response('Request not a DELETE method')
+@token_requierd
+def delete_lokal(acc):
     body = request.get_json()
     delLok = db.session.query(Lokal).get(body["id"])
     if not delLok:
@@ -183,22 +209,56 @@ def delete_lokal():
 
 @app.route('/api/getLokals', methods=['GET'])
 def get_lokals():
-    if request.method != 'GET':
-        return make_response("Request not a GET method")
     lokals = db.session.query(Lokal)
     returnedLokals = []
     for lokal in lokals:
         returnedLokals.append(
             {
                 "id": lokal._id,
-                "name": lokal.name
+                "name": lokal.name,
+                "types": [result.serialized for result in lokal.types],
+                "address": f"{lokal.address}, {lokal.plz} {lokal.city}",
             }
         )
     return jsonify(returnedLokals)
 
-@app.route('/api/ping', methods=['GET'])
-def pong():
-    return make_response("Pong")
+@app.route('/api/getLokal', methods=['GET'])
+def get_lokal():
+    lok = db.session.query(Lokal).get(request.args.get("id"))
+    return jsonify({ 
+        "name": lok.name,
+        "address": lok.address,
+        "plz": lok.plz,
+        "city": lok.city
+    })
+
+@app.route('/api/isOwner', methods=['GET'])
+@token_requierd
+def is_owner(acc):
+    lokale = db.session.query(Lokal)
+    for lok in lokale:
+        if lok.owner == acc._id:
+            return make_response("True") 
+    return make_response("False")
+
+@app.route('/api/getOwningLokals', methods=['GET'])
+@token_requierd
+def get_owning_lokals(acc):
+    lokals = db.session.query(Lokal)
+    returnedLokals = []
+    for lokal in lokals:
+        if lokal.owner == acc._id: 
+            returnedLokals.append(
+                {
+                    "id": lokal._id,
+                    "name": lokal.name,
+                    "types": [result.serialized for result in lokal.types],
+                    "address": f"{lokal.address}, {lokal.plz} {lokal.city}",
+                }
+        )
+    return jsonify(returnedLokals)
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=False)

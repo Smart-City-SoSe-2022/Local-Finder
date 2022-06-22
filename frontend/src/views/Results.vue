@@ -1,6 +1,7 @@
 <template>
     <div>
-        <LocationList :list="locations" @delete="del" 
+        <h1> Ergebnisse </h1>
+        <LocationList :list="locations" 
             @open-loc="openLocation"/>
     </div>
 </template>
@@ -15,50 +16,48 @@ export default {
     },
     data() {
         return {
-            locations: [
-                {
-                    "id": 1,
-                    "name": "Loc1",
-                    "address": "Straße Da 1",
-                    "open": "17 Uhr"
-                },
-                {
-                    "id": 2,
-                    "name": "Loc2",
-                    "address": "Straße Dort 7",
-                    "open": "10 Uhr biss 3 oder so"
-                },
-                {
-                    "id": 3,
-                    "name": "Loc3",
-                    "address": "Weg ist weg 9001",
-                    "open": "Wenn's passt."
-                },
-                {
-                    "id": 4,
-                    "name": "Loc1",
-                    "address": "Straße Da 1",
-                    "open": "17 Uhr"
-                },
-                {
-                    "id": 5,
-                    "name": "Loc2",
-                    "address": "Straße Dort 7",
-                    "open": "10 Uhr biss 3 oder so"
-                },
-                {
-                    "id": 6,
-                    "name": "Loc3",
-                    "address": "Weg ist weg 9001",
-                    "open": "Wenn's passt."
-                }
-            ]
+            locations: []
         }
     },
     methods: {
         openLocation(id) {
             this.$router.push({ name: 'LocalPage', params: { id: id} })
+        },
+        async fetchResults() {
+            const response = await fetch('api/getLokals')
+            const data = await response.json()
+            if (response.status === 200) {
+                return data
+            }
+            return {}
+        }, 
+        async fetchSearch() {
+            const body = {
+                name: this.$route.query.name,
+                type: this.$route.query.type,
+                city: this.$route.query.city,
+            }
+            const response = await fetch('api/search', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: JSON.stringify(body)
+            })
+            var data
+            if (response.status === 200) {
+                data = await response.json()
+                return data
+            } 
         }
+    },
+    async created() {
+        if (Object.entries(this.$route.query).length > 0) {
+            this.locations = await this.fetchSearch()
+        } else {
+            this.locations = await this.fetchResults()
+        }
+        
     }
 }
 </script>
