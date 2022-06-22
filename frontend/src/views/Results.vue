@@ -52,7 +52,6 @@ export default {
         }
     },
     async created() {
-        console.log()
         if (Object.entries(this.$route.query).length > 0) {
             this.locations = await this.fetchSearch()
         } else {

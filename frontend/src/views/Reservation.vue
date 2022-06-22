@@ -20,15 +20,12 @@ export default {
     },
 	methods: {
 		async fetchReservation() {
-			console.log("insanity check 1")
 			const response = await fetch("api/getReservations")
 			const data = await response.json()
-			console.log(data)
 			return data;
     	},
   	},
 	async created() {
-		console.log("insanity check 0")
 		this.reservations = await this.fetchReservation()
 	}
 };

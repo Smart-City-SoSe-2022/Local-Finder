@@ -76,7 +76,6 @@ export default {
             })
             const data = await response
             this.isFav = !this.isFav
-            console.log(data)
         },
     },
     async created() {

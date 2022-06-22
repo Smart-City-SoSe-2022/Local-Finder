@@ -53,7 +53,6 @@ export default {
                 })
             })
             const data = await response.text()
-            console.log(data)
             if (response.status === 200) {
                 alert("Anfrage zur für das Lokal wurde gesendet. Bitte warten Sie auf die Antwort der Stadtverwaltung.")
                 this.$router.push({ name: 'Home' })

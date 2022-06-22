@@ -40,16 +40,6 @@ def search():
     typ = body['type']
     city = body['city']
     objectList = []
-    if name == "login":
-        resp = make_response("login")
-        resp.set_cookie('JWT', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.1ZmCKNSftNJrb5gWSSyHbFr0rjYPRBzE2p3m1DkqmB8', samesite=None)
-        return resp
-    if name == "logout":
-        data = {'exp': 0}
-        token = jwt.encode(data, 'LOGGEDOUT', algorithm="HS256")
-        resp = make_response(jsonify({'msg': "Erfolgreich ausgeloggt."}), 200)
-        resp.set_cookie('JWT', token, samesite=None)
-        return resp
     if name != "":
         objectList = db.session.query(Lokal).filter(Lokal.name.like('%'+name+'%')).all()
         if not objectList:
@@ -125,7 +115,6 @@ def status_reservation(acc):
 @app.route('/api/getReservations', methods=['GET'])
 @token_requierd
 def get_Reservations(acc):
-    #acc = db.session.query(Account).get(request.args.get("id"))
     reservations = []
     for r in acc.reservation:
         lok = db.session.query(Lokal).get(r.reservedLocal)
@@ -136,7 +125,7 @@ def get_Reservations(acc):
                 "address": f"{lok.address}, {lok.plz} {lok.city}",
                 "types": [result.serialized for result in lok.types],
                 "reservedLocalId": r.reservedLocal,
-                "reservedLocalName": lok.name
+                "reservedName": lok.name
             }
         )
     return jsonify(reservations)
@@ -155,7 +144,7 @@ def get_Lokal_Reservations(acc):
                 "id": r._id,
                 "datetime": r.datetime,
                 "reservedBy": r.reservedBy,
-                "reservedByName": db.session.query(Account).get(r.reservedBy).name
+                "reservedName": db.session.query(Account).get(r.reservedBy).name
             }
         )
     return jsonify(reservations)
@@ -167,7 +156,6 @@ def get_Lokal_Reservations(acc):
 @token_requierd
 def toggle_favorite(acc):
     body = request.get_json()
-    #acc = db.session.query(Account).get(body['AccountId'])
     lokal = db.session.query(Lokal).get(body['lokalId'])
     if not lokal:
         return make_response("Local doesn't exsist.")
@@ -183,7 +171,6 @@ def toggle_favorite(acc):
 @app.route('/api/getFavorites', methods=['GET'])
 @token_requierd
 def get_favorites(acc):
-    #acc = db.session.query(Account).get(request.args.get("id"))
     if not acc:
         return make_response("Account doesn't exsist.")
     favorites = []
@@ -201,7 +188,6 @@ def get_favorites(acc):
 @token_requierd
 def is_favorite(acc):
     body = request.get_json()
-    #acc = db.session.query(Account).get(body["accId"])
     lok = db.session.query(Lokal).get(body["lokId"])
     if lok in acc.favorites:
         return make_response("True")
@@ -212,7 +198,6 @@ def is_favorite(acc):
 """ LOKAL """
 @app.route('/api/deleteLokal', methods=['DELETE'])
 @token_requierd
-# TODO only deletable if acc is owner
 def delete_lokal(acc):
     body = request.get_json()
     delLok = db.session.query(Lokal).get(body["id"])

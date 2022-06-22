@@ -33,7 +33,6 @@ export default {
                 })
             })
             const data = await response.text()
-            console.log(data)
         }
     }
 }

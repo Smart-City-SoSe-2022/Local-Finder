@@ -92,7 +92,7 @@ def account_created():
         #Adding Account
         acc = Account(_id = obj['id'], name = f"{fAcc['forename']} {fAcc['lastname']}", street=fAcc['address'], plz=fAcc['plz'])
         session.add(acc)
-        #session.commit()
+        session.commit()
         print(f' - Account angelegt: {acc}')
         session.close()
     receive('portal.account.created', '', callback)
