@@ -26,7 +26,8 @@ class Account(db.Model):
     
     favorites = relationship('Lokal', secondary=favTable, back_populates='faved_by')
     reservation = relationship("Reservation")
-    def __init__(self, name, street, plz):
+    def __init__(self, _id, name, street, plz):
+        self._id = _id
         self.name = name
         self.street = street
         self.plz = plz

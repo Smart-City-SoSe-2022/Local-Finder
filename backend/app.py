@@ -1,9 +1,8 @@
 from hashlib import algorithms_available
 from flask import Flask, jsonify, make_response, render_template, request_started, session, url_for, request
 from flask_sqlalchemy import SQLAlchemy
-# from rabbit import rabbit_bp, receiver_local_status
+from rabbit import rabbit_bp, receiver_local_status, receiver_acc_created, receiver_acc_deleted
 from flask_migrate import Migrate
-from datetime import datetime
 from dbModels import db, Account, Reservation, Lokal, LokalType, addObj
 from dotenv import dotenv_values
 from flask_cors import CORS
@@ -23,9 +22,10 @@ migrate = Migrate(app, db)
 
 
 """ Rabbit MQ Lister Threads """
-# app.register_blueprint(rabbit_bp)
-# receiver_local_status.start()
-
+app.register_blueprint(rabbit_bp)
+receiver_local_status.start()
+receiver_acc_created.start()
+receiver_acc_deleted.start()
 
 """ JWT Wrapper """
 def token_requierd(f):
