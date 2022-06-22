@@ -14,7 +14,7 @@ from jwt_authentication import token_requierd
 config = dotenv_values(".env")
 credentials = pika.PlainCredentials(config["RABBITMQ_USER"], config["RABBITMQ_PASSWORD"])
 exchange = config['EXCHANGE']
-host = config['HOST']
+host = config['RABBITMQ_URL']
 
 rabbit_bp = Blueprint('rabbit', __name__)
 

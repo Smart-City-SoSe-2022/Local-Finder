@@ -1,9 +1,9 @@
 <template>
 <div>
     <div id="header">
-        <img alt="Webportal" src="../assets/logo.png" width="100" height="100">
+        <img alt="Webportal" @click="goToPortal" src="../assets/Portal.png" width="100" height="100">
         <router-link to="/">
-            <img alt="LokalFinder" src="../assets/logo.png" width="100" height="100">
+            <img alt="LokalFinder" src="../assets/Home.png" width="100" height="100">
         </router-link>
         <img alt="LokalFinder" src="../assets/luppe.png" width="100" height="100"
             @click="toggleSearchBox"
@@ -59,6 +59,9 @@ export default {
         }
     },
     methods: {
+        goToPortal() {
+            window.location.href='http://server.it-humke.de:8001/'
+        },
         toggleSearchBox() {
             this.search = !this.search;
         },
