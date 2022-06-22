@@ -101,5 +101,12 @@ a:visited {
     text-decoration: none;
 }
 
+input {
+    padding: 5px;
+    border: 2px solid black;
+    margin: 0 5px;
+    border-radius: 10px;
+}
+
 
 </style>

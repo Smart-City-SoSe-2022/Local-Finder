@@ -180,27 +180,6 @@ def get_Lokal_Reservations(acc):
 
 
 
-
-""" ACCOUNT """
-@app.route('/api/createAccount', methods=['POST'])
-def create_account():
-    body = request.get_json()
-    newAcc = Account(name=body["lastname"], street=body["address"], plz=body["plz"])
-    addObj(newAcc)
-    return make_response("Account Created")
-
-@app.route('/api/deleteAccount', methods=['DELETE'])
-def delete_account():
-    body = request.get_json()
-    delAcc = db.session.query(Account).get(body["id"])
-    if not delAcc:
-        return make_response("Account doesn't exist.")
-    db.session.delete(delAcc)
-    db.session.commit()
-    return make_response("Account deletet.")
-
-
-
 """ Favorites """
 @app.route('/api/toggleFavorite', methods=['POST'])
 @token_requierd
@@ -280,6 +259,32 @@ def get_lokals():
 def get_lokal():
     lok = db.session.query(Lokal).get(request.args.get("id"))
     return jsonify({ "name": lok.name})
+
+@app.route('/api/isOwner', methods=['GET'])
+@token_requierd
+def is_owner(acc):
+    lokale = db.session.query(Lokal)
+    for lok in lokale:
+        if lok.owner == acc._id:
+            return make_response("True") 
+    return make_response("False")
+
+@app.route('/api/getOwningLokals', methods=['GET'])
+@token_requierd
+def get_owning_lokals(acc):
+    lokals = db.session.query(Lokal)
+    returnedLokals = []
+    for lokal in lokals:
+        if lokal.owner == acc._id: 
+            returnedLokals.append(
+                {
+                    "id": lokal._id,
+                    "name": lokal.name,
+                    "types": [result.serialized for result in lokal.types],
+                    "address": f"{lokal.address}, {lokal.plz} {lokal.city}",
+                }
+        )
+    return jsonify(returnedLokals)
 
 
 
