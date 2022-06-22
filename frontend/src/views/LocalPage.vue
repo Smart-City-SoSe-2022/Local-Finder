@@ -12,7 +12,7 @@
          @click="toggleFav"
     >
     <h1> {{this.location.name}}</h1>
-    <p>{{this.location.address}}</p>
+    <p>{{this.location.address}}, {{this.location.plz}} {{this.location.city}}</p>
     <p>{{this.location.open}}</p>
 </div>
 </template>

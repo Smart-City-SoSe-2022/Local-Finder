@@ -1,9 +1,13 @@
 <template>
     <div>
-        <input type="text" v-model="date" name="date" placeholder="Datum angeben..."/>
-        <input type="text" v-model="time" name="time" placeholder="Uhrzeit angeben..."/>
-        <button class="button" tpye="button" @click="onSubmit()"> Reservieren </button>
+        <h2 style="user-select: none; cursor: pointer" @click="this.show = !this.show"> Termin Reservieren </h2>
+        <form v-show="show">
+            <input type="text" v-model="date" name="date" placeholder="Datum angeben..."/>
+            <input type="text" v-model="time" name="time" placeholder="Uhrzeit angeben..."/>
+            <button class="button" type="button" @click="onSubmit()"> Reservieren </button>
+        </form>
     </div>
+
 </template>
 
 <script>
@@ -12,7 +16,8 @@ export default {
     data() {
         return {
             date: '',
-            time: ''
+            time: '',
+            show: false
         }
     },
     methods: {

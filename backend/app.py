@@ -240,7 +240,12 @@ def get_lokals():
 @app.route('/api/getLokal', methods=['GET'])
 def get_lokal():
     lok = db.session.query(Lokal).get(request.args.get("id"))
-    return jsonify({ "name": lok.name})
+    return jsonify({ 
+        "name": lok.name,
+        "address": lok.address,
+        "plz": lok.plz,
+        "city": lok.city
+    })
 
 @app.route('/api/isOwner', methods=['GET'])
 @token_requierd
