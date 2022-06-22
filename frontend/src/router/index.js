@@ -5,6 +5,7 @@ import About from '../views/About.vue'
 import LocalPage from '../views/LocalPage.vue'
 import Favoriten from '../views/Favoriten.vue'
 import Reservation from '../views/Reservation.vue'
+import NewLocation from '../views/NewLocation.vue'
 
 const routes = [
     {
@@ -37,6 +38,11 @@ const routes = [
         path: '/reservierungen',
         name : 'Reservation',
         component: Reservation
+    },
+    {
+        path: '/newLocation',
+        name: 'NewLocation',
+        component: NewLocation
     }
 ]
 

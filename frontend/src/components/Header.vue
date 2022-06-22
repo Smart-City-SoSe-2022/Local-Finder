@@ -27,7 +27,7 @@
                 v-for="lokal in ownedLokals"
                 > {{lokal.name}}
             </div>
-            <div class="add_lokal" data-hover="Lokal hinzufügen"> + </div>
+            <router-link to="/newLocation" class="add_lokal" data-hover="Lokal hinzufügen"> + </router-link>
         </div>
         
 

@@ -101,11 +101,21 @@ a:visited {
     text-decoration: none;
 }
 
-input {
-    padding: 5px;
-    border: 2px solid black;
-    margin: 0 5px;
+form {
+    margin: 0 auto;
+}
+form > input {
+    display: block;
+    min-width: 35ch;
+    margin: 10px auto; 
+    padding: 5px 10px;
+    font-size: 2ch;
+    border: 2px solid #ddf;
     border-radius: 10px;
+}
+
+form > input:focus {
+    border: 2px solid black;
 }
 
 
