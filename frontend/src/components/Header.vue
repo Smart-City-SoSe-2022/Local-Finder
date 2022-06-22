@@ -54,10 +54,10 @@ export default {
         }
     },
     watch: {
-            '$route.path': function() {
-                this.search = false
-            }
-        },
+        '$route.path': function() {
+            this.search = false
+        }
+    },
     methods: {
         toggleSearchBox() {
             this.search = !this.search;

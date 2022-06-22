@@ -1,6 +1,7 @@
 import json
 import pika
 import threading
+import requests
 from flask import jsonify, make_response, request, Blueprint
 from flask_cors import CORS
 from dbModels import Lokal, Account
@@ -80,16 +81,18 @@ def account_created():
         # Getting Obj
         obj = json.loads(body)
         print(f"{config['PORTAL_URL']}portal/get/{obj['id']}")
-        fAcc = request.get(f"{config['PORTAL_URL']}portal/get/{obj['id']}")
+        cookies = {'JWT': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.x1ts3F6kPW4knJoV39M-DG2mEBzcuEVgj7QZBkJIXsc'}
+        fAcc = requests.get(f"{config['PORTAL_URL']}portal/get/{obj['id']}", cookies=cookies).json()
+        print(fAcc)
         # Setup DB Connection
         engine = create_engine(dotenv_values(".env")["DB_FULL_URI"])
         session_factory = sessionmaker(bind=engine)
         Session = scoped_session(session_factory)
         session = Session()
         #Adding Account
-        acc = Account(_id = obj['id'], name = f"{fAcc.forename} {fAcc.lastname}", street=fAcc.address, plz=fAcc.plz)
+        acc = Account(_id = obj['id'], name = f"{fAcc['forename']} {fAcc['lastname']}", street=fAcc['address'], plz=fAcc['plz'])
         session.add(acc)
-        session.commit()
+        #session.commit()
         print(f' - Account angelegt: {acc}')
         session.close()
     receive('portal.account.created', '', callback)
