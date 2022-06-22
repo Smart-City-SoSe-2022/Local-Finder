@@ -1,4 +1,4 @@
-name: Docker
+name: Build and Deploy
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -6,6 +6,10 @@ name: Docker
 # documentation.
 
 on:
+  push:
+    branches: [ main ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ main ]
 
@@ -20,7 +24,6 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -124,7 +127,7 @@ jobs:
           
   deploy_backend:
     name: Deploy Backend
-    if: github.event.pull_request.merged == true
+    #if: github.event.pull_request.merged == true
     needs: [ build_backend ]
     runs-on: ubuntu-latest
     steps:
@@ -150,7 +153,7 @@ jobs:
             
   deploy_frontend:
     name: Deploy Frontend
-    if: github.event.pull_request.merged == true
+    #if: github.event.pull_request.merged == true
     needs: [ build ]
     runs-on: ubuntu-latest
     steps:
@@ -173,5 +176,3 @@ jobs:
             frontend/manifest/service.yaml
           images: |
             ${{ env.REGISTRY }}/${{ env.FRONTEND_NAME }}:${{ github.sha }}
-
-
