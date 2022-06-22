@@ -6,7 +6,7 @@
             <input type="text" v-model="street" name="street" placeholder="Straße angeben..."/>
             <input type="text" v-model="plz" name="plz" placeholder="Postleitzahl angeben..."/>
             <input type="text" v-model="city" name="city" placeholder="Stadt angeben..."/>
-            <button class="button" tpye="button" @click="onSubmit()"> Reservieren </button>
+            <button class="button" type="button" @click="submit()"> Reservieren </button>
         </form>
     </div>
 </template>
@@ -23,7 +23,7 @@ export default {
         }
     },
     methods: {
-        async onSubmit() {
+        async submit() {
             if (!this.lokalname) {
                 alert("Bitte einen Lokalnamen angeben!")
                 return
@@ -53,6 +53,7 @@ export default {
                 })
             })
             const data = await response.text()
+            console.log(data)
             if (response.status === 200) {
                 alert("Anfrage zur für das Lokal wurde gesendet. Bitte warten Sie auf die Antwort der Stadtverwaltung.")
                 this.$router.push({ name: 'Home' })

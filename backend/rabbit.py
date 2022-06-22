@@ -7,6 +7,7 @@ from dbModels import Lokal, Account
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from dotenv import dotenv_values
+from jwt_authentication import token_requierd
 
 
 config = dotenv_values(".env")
@@ -34,10 +35,20 @@ def receive(key, queue, callback):
 
 """ Sending route for new location authentication """
 @rabbit_bp.route('/api/requestLocal', methods=['POST'])
-def request_local():
+@token_requierd
+def request_local(acc):
     if request.method != 'POST':
         return "Not a POST method"
     body = request.get_json()
+    newLocaiton = {
+            "ownerId": acc._id,
+            "ownerName": acc.name,
+            "localName": body['lokalname'],
+            "address": body['street'],
+            "plz": body['plz'],
+            "city": body['city'],
+            "accepted": False
+    }
     send(key='auth.create', queue=config['QUEUE'], body=json.dumps(body))
     return make_response("Local Auth has been send.")
 
