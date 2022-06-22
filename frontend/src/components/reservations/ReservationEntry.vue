@@ -9,9 +9,6 @@
                 <p style="margin-left: 20px"> {{location.address}} </p>
             </td>
             <td>
-                <p> 300 km </p>
-            </td>
-            <td>
                 <p> {{location.datetime}} </p>
             </td>
         </tr>

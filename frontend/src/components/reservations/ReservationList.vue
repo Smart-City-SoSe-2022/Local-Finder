@@ -5,7 +5,6 @@
             <tr id="tablehead">
                 <td></td>
                 <td>Lokal</td>
-                <td>Entfernung</td>
                 <td>Reserviert um</td>
             </tr>
         </table>
@@ -67,16 +66,12 @@ td:nth-child(1) {
 /* Adresse */
 td:nth-child(2) {
     text-align: left;
-    width: 45%;
-}
-/* Entfernung */
-td:nth-child(3) {
-    width: 15%;
+    width: 50%;
 }
 /* Offen */
 td:nth-child(4) {
     padding-right: 10px;
     text-align: right;
-    width: 20%;
+    width: 30%;
 }
 </style>

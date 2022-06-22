@@ -38,6 +38,11 @@ export default {
         search: false
       }
   },
+  watch: {
+        '$route.path': function() {
+            this.search = false
+        }
+    },
   methods: {
       toggleSearchBox() {
           this.search = !this.search;
