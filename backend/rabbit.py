@@ -21,14 +21,13 @@ rabbit_bp = Blueprint('rabbit', __name__)
 def send(key, queue, body:str):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host, credentials=credentials))
     channel = connection.channel()
-    channel.queue_declare(queue=queue)
     channel.basic_publish(exchange=exchange, routing_key=key, body=body)
     connection.close()
 
 def receive(key, queue, callback):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host, credentials=credentials))
     channel = connection.channel()
-    channel.queue_declare(queue=queue)
+    channel.queue_declare(queue=config['QUEUE'])
     channel.exchange_declare(exchange='microservice.eventbus', exchange_type='topic')
     channel.queue_bind(exchange=exchange, queue=queue, routing_key=key)
     channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True )
@@ -50,7 +49,7 @@ def request_local(acc):
             "city": body['city'],
             "accepted": False
     }
-    send(key='auth.create', queue=config['QUEUE'], body=json.dumps(body))
+    send(key='auth.create', body=json.dumps(body))
     return make_response("Local Auth has been send.")
 
 """ Receiver for answer from Stadtverwaltung """
@@ -73,7 +72,7 @@ def local_status():
             return make_response("ERROR accured. Couldn't create Database Object. In Rabbit!")
         print(' - Erhalten : %r' % obj)
         session.close()
-    receive('auth.state', config['QUEUE'], callback)
+    receive('auth.state', callback)
 
 """ Reciver for Creating Account """
 def account_created():
@@ -95,7 +94,7 @@ def account_created():
         session.commit()
         print(f' - Account angelegt: {acc}')
         session.close()
-    receive('portal.account.created', '', callback)
+    receive('portal.account.created', callback)
 
 """ Reciver for Deleting Account """
 def account_deleted():
@@ -115,7 +114,7 @@ def account_deleted():
         else:
             print("Account konnte nicht gefunden werden.")
         session.close()
-    receive('portal.account.deleted', '', callback)
+    receive('portal.account.deleted', callback)
 
 
 """ Receiver Threads, start in App.py """
