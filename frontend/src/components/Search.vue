@@ -3,7 +3,15 @@
     <div id="search">
         <form>
             <input type="text" v-model="name" name="name" placeholder="Lokalname..."/>
-            <input type="text" v-model="type" name="type" placeholder="Lokaltyp..."/>
+            <select name="type" v-model="type">
+                <option value=""></option>
+                <option value="Bar">Bar</option>
+                <option value="Restaurant">Restaurant</option>
+                <option value="Fast Food">Fast Food</option>
+                <option value="Café">Café</option>
+                <option value="Buffet">Buffet</option>
+                <option value="Imbiss">Imbiss</option>
+            </select>
             <input type="text" v-model="city" name="city" placeholder="Stadt..." />
             <button class="button" type="button" @click="onSubmit()"> Suche starten!</button>
         </form>
@@ -49,7 +57,7 @@ export default {
         
         margin: 0 auto;
     }
-    form > input {
+    form > input, select {
         display: block;
         min-width: 35ch;
         margin: 10px auto; 

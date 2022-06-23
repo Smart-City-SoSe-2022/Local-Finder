@@ -6,6 +6,7 @@ import LocalPage from '../views/LocalPage.vue'
 import Favoriten from '../views/Favoriten.vue'
 import Reservation from '../views/Reservation.vue'
 import NewLocation from '../views/NewLocation.vue'
+import ReservationLokal from '../views/ReservationLokal.vue'
 
 const routes = [
     {
@@ -43,7 +44,13 @@ const routes = [
         path: '/newLocation',
         name: 'NewLocation',
         component: NewLocation
-    }
+    },
+    {
+        path: '/reservierungenLokal/:id',
+        name : 'ReservationLokal',
+        component: ReservationLokal,
+        params: true
+    },
 ]
 
 const router = createRouter({

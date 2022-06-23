@@ -133,10 +133,9 @@ def get_Reservations(acc):
 @app.route('/api/getLokalReservations', methods=['GET'])
 @token_requierd
 def get_Lokal_Reservations(acc):
-    body = request.get_json()
-    lokal = db.session.query(Lokal).get(body["id"])
+    lokal = db.session.query(Lokal).get(request.args.get("id"))
     if not lokal:
-        return make_response("Lokal doesn't exsist.")
+        return make_response("Lokal doesn't exsist."), 501
     reservations = []
     for r in lokal.reservation:
         reservations.append(

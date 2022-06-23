@@ -38,10 +38,10 @@ export default {
         }
     },
     watch: {
-            '$route.path': async function() {
-                this.location = await this.fetchLokal()
-            }
-        },
+        '$route.path': async function() {
+            this.location = await this.fetchLokal()
+        }
+    },
     methods: {
         async fetchLokal() {
             const response = await fetch('/api/getLokal?id='+this.$route.params.id)
