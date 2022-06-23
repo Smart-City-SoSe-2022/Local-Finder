@@ -4,6 +4,7 @@
         <form>
             <input type="text" v-model="name" name="name" placeholder="Lokalname..."/>
             <select name="type" v-model="type">
+                <option value=""></option>
                 <option value="Bar">Bar</option>
                 <option value="Restaurant">Restaurant</option>
                 <option value="Fast Food">Fast Food</option>

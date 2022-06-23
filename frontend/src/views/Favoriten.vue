@@ -24,7 +24,7 @@ export default {
             this.$router.push({ name: 'LocalPage', params: { id: id} })
         },
         async fetchResults() {
-            const response = await fetch('api/getFavorites?id='+1) //CHANGE TO ACC ID
+            const response = await fetch('api/getFavorites')
             const data = await response.json()
             if (response.status === 200) {
                 return data

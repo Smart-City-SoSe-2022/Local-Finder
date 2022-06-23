@@ -84,7 +84,7 @@ export default {
             return data
         },
         openLocation(id) {
-            this.$router.push({ name: 'LocalPage', params: { id: id} })
+            this.$router.push({ name: 'ReservationLokal', params: { id: id} })
         },
     },
     async created() {
