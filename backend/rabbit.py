@@ -14,20 +14,21 @@ from jwt_authentication import token_requierd
 config = dotenv_values(".env")
 credentials = pika.PlainCredentials(config["RABBITMQ_USER"], config["RABBITMQ_PASSWORD"])
 exchange = config['EXCHANGE']
+queue = config['QUEUE']
 host = config['RABBITMQ_URL']
 
 rabbit_bp = Blueprint('rabbit', __name__)
 
-def send(key, queue, body:str):
+def send(key, body:str):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host, credentials=credentials))
     channel = connection.channel()
     channel.basic_publish(exchange=exchange, routing_key=key, body=body)
     connection.close()
 
-def receive(key, queue, callback):
+def receive(key, callback):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host, credentials=credentials))
     channel = connection.channel()
-    channel.queue_declare(queue=config['QUEUE'])
+    channel.queue_declare(queue=queue)
     channel.exchange_declare(exchange='microservice.eventbus', exchange_type='topic')
     channel.queue_bind(exchange=exchange, queue=queue, routing_key=key)
     channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True )
