@@ -73,13 +73,19 @@ export default {
             }
         },
         async isOwner() {
-            const response = await fetch('http://server.it-humke.de:9004/api/isOwner')
+            const response = await fetch('http://server.it-humke.de:9004/api/isOwner', {
+                redirect: 'follow',
+                credentials: 'include'
+            })
             const data = await response.text()
             if (data == "True") return true
             return false
         },
         async fetchOwnedLokals() {
-            const response = await fetch('http://server.it-humke.de:9004/api/getOwningLokals')
+            const response = await fetch('http://server.it-humke.de:9004/api/getOwningLokals', {
+                redirect: 'follow',
+                credentials: 'include'
+            })
             if(response.ok){
                 const data = await response.json()
                 return data

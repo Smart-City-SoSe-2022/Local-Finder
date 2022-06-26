@@ -20,7 +20,10 @@ export default {
     },
 	methods: {
 		async fetchReservation() {
-			const response = await fetch("http://server.it-humke.de:9004/api/getReservations")
+			const response = await fetch("http://server.it-humke.de:9004/api/getReservations", {
+				redirect: 'follow',
+                credentials: 'include'
+            })
 			if(response.ok){
                 const data = await response.json()
                 return data

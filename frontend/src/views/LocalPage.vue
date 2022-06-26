@@ -44,7 +44,10 @@ export default {
     },
     methods: {
         async fetchLokal() {
-            const response = await fetch('http://server.it-humke.de:9004/api/getLokal?id='+this.$route.params.id)
+            const response = await fetch('http://server.it-humke.de:9004/api/getLokal?id='+this.$route.params.id, {
+                redirect: 'follow',
+                credentials: 'include'
+            })
             if(response.ok){
                 const data = await response.json()
                 return data
@@ -62,7 +65,9 @@ export default {
 				body: JSON.stringify({
                     "accId": 1,
                     "lokId": this.$route.params.id
-                })
+                }),
+                redirect: 'follow',
+                credentials: 'include'
             })
             const data = await response.text()
             if(data == "True") return true
@@ -77,7 +82,9 @@ export default {
 				body: JSON.stringify({
                     "AccountId": 1,
                     "lokalId": this.$route.params.id
-                })
+                }),
+                redirect: 'follow',
+                credentials: 'include'
             })
             const data = await response
             this.isFav = !this.isFav
