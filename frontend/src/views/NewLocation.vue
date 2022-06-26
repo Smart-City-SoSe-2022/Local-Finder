@@ -50,7 +50,9 @@ export default {
                     'street': this.street,
                     'plz': this.plz,
                     'city': this.city
-                })
+                }),
+                redirect: 'follow',
+                credentials: 'include'
             })
             const data = await response.text()
             if (response.status === 200) {

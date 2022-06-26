@@ -24,7 +24,10 @@ export default {
             this.$router.push({ name: 'LocalPage', params: { id: id} })
         },
         async fetchResults() {
-            const response = await fetch('http://server.it-humke.de:9004/api/getLokals')
+            const response = await fetch('http://server.it-humke.de:9004/api/getLokals', {
+                redirect: 'follow',
+                credentials: 'include'
+            })
             if(response.ok){
                 const data = await response.json()
                 return data
@@ -44,7 +47,9 @@ export default {
                 headers: {
                     'Content-type': 'application/json',
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
+                redirect: 'follow',
+                credentials: 'include'
             })
             var data
             if(response.ok){

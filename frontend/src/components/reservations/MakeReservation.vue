@@ -30,7 +30,9 @@ export default {
                 body: JSON.stringify({
                     'datetime': this.date + ', '+this.time,
                     'localId': this.$route.params.id
-                })
+                }),
+                redirect: 'follow',
+                credentials: 'include'
             })
             const data = await response.text()
         }

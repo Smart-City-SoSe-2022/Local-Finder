@@ -25,7 +25,10 @@ export default {
     },
 	methods: {
 		async fetchReservation() {
-			const response = await fetch("/api/getLokalReservations?id="+this.$route.params.id)
+			const response = await fetch("/api/getLokalReservations?id="+this.$route.params.id, {
+				redirect: 'follow',
+                credentials: 'include'
+            })
 			if (response.status === 501) {
                 console.log( "Lokal konnte nicht gefunden werden")
                 return
