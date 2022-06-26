@@ -2,7 +2,7 @@
 <div id="body">
     <Header/>
     <div v-show="this.debug" style="background: pink">
-        <router-link to="/results">Ergebnisse</router-link>
+        <!--router-link to="/results">Ergebnisse</router-link-->
     </div>
     <router-view/>
     <div class="footer">
