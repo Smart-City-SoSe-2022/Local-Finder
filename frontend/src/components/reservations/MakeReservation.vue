@@ -22,7 +22,7 @@ export default {
     },
     methods: {
         async onSubmit() {
-            const response = await fetch('/api/requestReservation',{
+            const response = await fetch('http://server.it-humke.de:9004/api/requestReservation',{
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',

@@ -24,7 +24,7 @@ export default {
             this.$router.push({ name: 'LocalPage', params: { id: id} })
         },
         async fetchResults() {
-            const response = await fetch('api/getLokals')
+            const response = await fetch('http://server.it-humke.de:9004/api/getLokals')
             if(response.ok){
                 const data = await response.json()
                 return data
@@ -39,7 +39,7 @@ export default {
                 type: this.$route.query.type,
                 city: this.$route.query.city,
             }
-            const response = await fetch('api/search', {
+            const response = await fetch('http://server.it-humke.de:9004/api/search', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',

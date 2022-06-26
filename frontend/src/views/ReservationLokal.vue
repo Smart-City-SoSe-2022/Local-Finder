@@ -30,8 +30,13 @@ export default {
                 console.log( "Lokal konnte nicht gefunden werden")
                 return
             }
-            const data = await response.json()
-			return data;
+            if(response.ok){
+                const data = await response.json()
+                return data
+            } else {
+                console.log(await response.text())
+				return null
+            }
     	},
   	},
 	async created() {

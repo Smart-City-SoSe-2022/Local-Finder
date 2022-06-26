@@ -24,12 +24,14 @@ export default {
             this.$router.push({ name: 'LocalPage', params: { id: id} })
         },
         async fetchResults() {
-            const response = await fetch('api/getFavorites')
-            const data = await response.json()
-            if (response.status === 200) {
+            const response = await fetch('http://server.it-humke.de:9004/api/getFavorites')
+            if(response.ok){
+                const data = await response.json()
                 return data
+            } else {
+                console.log(await response.text())
+                return {}
             }
-            return {}
         }
     },
     async created() {
