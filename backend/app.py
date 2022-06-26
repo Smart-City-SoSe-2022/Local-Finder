@@ -257,6 +257,46 @@ def get_owning_lokals(acc):
         )
     return jsonify(returnedLokals)
 
+@app.route('/api/set_db_lokaltypes', methods=['GET'])
+def setlokaltypes():
+    restaurant = db.session.query(LokalType).get(1)
+    fastfood = db.session.query(LokalType).get(2)
+    bar = db.session.query(LokalType).get(3)
+    cafe = db.session.query(LokalType).get(4)
+    buffet = db.session.query(LokalType).get(5)
+    imbiss = db.session.query(LokalType).get(6)
+
+    lokal2 = db.session.query(Lokal).get(2)
+    lokal2.types.remove(restaurant)
+    lokal2.types.remove(fastfood)
+    lokal2.types.append(cafe)
+
+    lokal4 = db.session.query(Lokal).get(4)
+    lokal4.types.remove(bar)
+    lokal4.types.append(buffet)
+
+    lokal5 = db.session.query(Lokal).get(5)
+    lokal5.types.remove(buffet)
+    lokal5.types.append(cafe)
+
+    lokal6 = db.session.query(Lokal).get(6)
+    lokal6.types.remove(imbiss)
+    lokal6.types.append(cafe)
+
+    lokal7 = db.session.query(Lokal).get(7)
+    lokal7.types.append(restaurant)
+
+    lokal8 = db.session.query(Lokal).get(8)
+    lokal8.types.append(restaurant)
+
+    lokal9 = db.session.query(Lokal).get(9)
+    lokal9.types.append(fastfood)
+
+    lokal10 = db.session.query(Lokal).get(10)
+    lokal10.types.append(bar)
+
+    db.session.commit()
+    return make_response("Datensätze geupdated")
 
 
 if __name__ == '__main__':
