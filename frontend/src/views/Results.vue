@@ -24,12 +24,14 @@ export default {
             this.$router.push({ name: 'LocalPage', params: { id: id} })
         },
         async fetchResults() {
-            const response = await fetch('api/getLokals')
-            const data = await response.json()
-            if (response.status === 200) {
+            const response = await fetch('http://server.it-humke.de:9004/api/getLokals')
+            if(response.ok){
+                const data = await response.json()
                 return data
+            } else {
+                console.log(await response.text())
+                return {}
             }
-            return {}
         }, 
         async fetchSearch() {
             const body = {
@@ -37,7 +39,7 @@ export default {
                 type: this.$route.query.type,
                 city: this.$route.query.city,
             }
-            const response = await fetch('api/search', {
+            const response = await fetch('http://server.it-humke.de:9004/api/search', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
@@ -45,10 +47,12 @@ export default {
                 body: JSON.stringify(body)
             })
             var data
-            if (response.status === 200) {
-                data = await response.json()
+            if(response.ok){
+                const data = await response.json()
                 return data
-            } 
+            } else {
+                console.log(await response.text())
+            }
         }
     },
     async created() {

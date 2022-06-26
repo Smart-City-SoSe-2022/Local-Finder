@@ -40,7 +40,7 @@ export default {
                 alert("Bitte eine Stadt angeben!")
                 return
             }
-            const response = await fetch('/api/requestLocal',{
+            const response = await fetch('http://server.it-humke.de:9004/api/requestLocal',{
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',

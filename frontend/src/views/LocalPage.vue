@@ -44,12 +44,17 @@ export default {
     },
     methods: {
         async fetchLokal() {
-            const response = await fetch('/api/getLokal?id='+this.$route.params.id)
-            const data = await response.json()
-            return data
+            const response = await fetch('http://server.it-humke.de:9004/api/getLokal?id='+this.$route.params.id)
+            if(response.ok){
+                const data = await response.json()
+                return data
+            } else {
+                console.log(await response.text())
+                return null
+            }
         },
         async isFaved() {
-            const response = await fetch('/api/isFavorite', {
+            const response = await fetch('http://server.it-humke.de:9004/api/isFavorite', {
                 method: 'POST',
 				headers: {
 					'Content-type': 'application/json',
@@ -64,7 +69,7 @@ export default {
             return false
         },
         async toggleFav() {
-            const response = await fetch('/api/toggleFavorite', {
+            const response = await fetch('http://server.it-humke.de:9004/api/toggleFavorite', {
                 method: 'POST',
 				headers: {
 					'Content-type': 'application/json',
