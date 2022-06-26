@@ -80,8 +80,13 @@ export default {
         },
         async fetchOwnedLokals() {
             const response = await fetch('/api/getOwningLokals')
-            const data = await response.json()
-            return data
+            if(response.ok){
+                const data = await response.json()
+                return data
+            } else {
+                console.log(await response.text())
+            }
+            
         },
         openLocation(id) {
             this.$router.push({ name: 'ReservationLokal', params: { id: id} })
