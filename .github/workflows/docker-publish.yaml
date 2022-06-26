@@ -9,8 +9,7 @@ on:
   pull_request:
     branches: [ 'main' ]
     types: [ 'closed' ]
-  push:
-    branches: [ 'main' ]
+    
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
