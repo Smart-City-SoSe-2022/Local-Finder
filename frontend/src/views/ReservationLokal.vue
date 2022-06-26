@@ -25,7 +25,7 @@ export default {
     },
 	methods: {
 		async fetchReservation() {
-			const response = await fetch("/api/getLokalReservations?id="+this.$route.params.id, {
+			const response = await fetch("http://server.it-humke.de:9004/api/getLokalReservations?id="+this.$route.params.id, {
 				redirect: 'follow',
                 credentials: 'include'
             })
